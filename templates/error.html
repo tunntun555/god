@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกิดข้อผิดพลาด - Photo Booth</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        .error-code {
+            font-size: 5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #f56565;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        p {
+            margin: 10px 0;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+        .links {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        a {
+            color: white;
+            background: rgba(255,255,255,0.2);
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: block;
+        }
+        a:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        .error-details {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        .home-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        {% if error_code == 404 %}
+        <div class="icon">
+            <i class="fas fa-map-signs"></i>
+        </div>
+        <div class="error-code">404</div>
+        <h1>ไม่พบหน้าเว็บ</h1>
+        <p>หน้าที่คุณต้องการไม่พบในระบบ</p>
+        <p>กรุณาตรวจสอบ URL หรือกลับไปหน้าแรก</p>
+        
+        {% elif error_code == 500 %}
+        <div class="icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="error-code">500</div>
+        <h1>เกิดข้อผิดพลาดในเซิร์ฟเวอร์</h1>
+        <p>ระบบกำลังประสบปัญหาชั่วคราว</p>
+        <p>โปรดลองใหม่อีกครั้งในภายหลัง</p>
+        
+        {% else %}
+        <div class="icon">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="error-code">{{ error_code }}</div>
+        <h1>เกิดข้อผิดพลาด</h1>
+        <p>{{ error_message }}</p>
+        {% endif %}
+        
+        <div class="links">
+            <a href="/" class="home-btn">
+                <i class="fas fa-home"></i> กลับหน้าหลัก
+            </a>
+            <a href="/capture">
+                <i class="fas fa-camera"></i> หน้าถ่ายรูป
+            </a>
+            <a href="/qr">
+                <i class="fas fa-qrcode"></i> หน้าแสดง QR
+            </a>
+            <a href="/admin">
+                <i class="fas fa-cog"></i> หน้าแอดมิน
+            </a>
+            <a href="javascript:history.back()">
+                <i class="fas fa-arrow-left"></i> กลับไปหน้าที่แล้ว
+            </a>
+        </div>
+        
+        {% if error_code == 404 %}
+        <div class="error-details">
+            <p><strong>URL ที่ต้องการ:</strong> {{ request.path }}</p>
+            <p><strong>วิธีแก้ไข:</strong></p>
+            <ul>
+                <li>ตรวจสอบการพิมพ์ URL</li>
+                <li>เว็บไซต์อาจมีการเปลี่ยนแปลงลิงค์</li>
+                <li>ใช้เมนูด้านบนเพื่อไปยังหน้าที่ต้องการ</li>
+            </ul>
+        </div>
+        {% endif %}
+        
+        <p style="margin-top: 30px; font-size: 0.9rem; opacity: 0.8;">
+            <i class="fas fa-server"></i> Server: us1.bot-hosting.net:21555
+            <br>
+            <i class="fas fa-clock"></i> เวลา: <span id="currentTime"></span>
+        </p>
+    </div>
+    
+    <script>
+        // แสดงเวลาปัจจุบัน
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('th-TH');
+            const dateStr = now.toLocaleDateString('th-TH', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('currentTime').textContent = 
+                `${dateStr} ${timeStr}`;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>

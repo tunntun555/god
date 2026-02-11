@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>รับรูปของคุณ - Photo Booth</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			color: #333;
+			padding: 20px;
+		}
+
+		.container {
+			max-width: 500px;
+			margin: 0 auto;
+			background: white;
+			border-radius: 20px;
+			overflow: hidden;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+		}
+
+		.header {
+			text-align: center;
+			padding: 30px 20px;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+		}
+
+		.header h1 {
+			font-size: 2rem;
+			margin-bottom: 10px;
+		}
+
+		.code-display {
+			font-size: 1.8rem;
+			font-weight: bold;
+			background: rgba(255, 255, 255, 0.2);
+			padding: 10px 20px;
+			border-radius: 10px;
+			margin: 15px auto;
+			display: inline-block;
+			font-family: monospace;
+			letter-spacing: 2px;
+		}
+
+		.error-message {
+			text-align: center;
+			padding: 50px 20px;
+			color: #f56565;
+		}
+
+		.error-message i {
+			font-size: 4rem;
+			margin-bottom: 20px;
+		}
+
+		.photo-preview {
+			padding: 20px;
+			background: #f7fafc;
+		}
+
+		.photo-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+			gap: 10px;
+			margin-top: 15px;
+		}
+
+		.photo-item {
+			position: relative;
+			border-radius: 10px;
+			overflow: hidden;
+			box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		}
+
+		.photo-item img {
+			width: 100%;
+			height: 120px;
+			object-fit: cover;
+			display: block;
+		}
+
+		.photo-number {
+			position: absolute;
+			top: 5px;
+			right: 5px;
+			background: rgba(0,0,0,0.7);
+			color: white;
+			padding: 3px 8px;
+			border-radius: 50%;
+			font-size: 0.8rem;
+		}
+
+		.download-section {
+			padding: 25px;
+			text-align: center;
+		}
+
+		.btn {
+			display: block;
+			width: 100%;
+			padding: 15px;
+			margin: 10px 0;
+			border: none;
+			border-radius: 10px;
+			font-size: 1.1rem;
+			font-weight: bold;
+			cursor: pointer;
+			transition: all 0.3s;
+			text-decoration: none;
+			text-align: center;
+		}
+
+		.btn-primary {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+		}
+
+		.btn-secondary {
+			background: #48bb78;
+			color: white;
+		}
+
+		.btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+		}
+
+		.info-box {
+			background: #f8f9fa;
+			padding: 15px;
+			border-radius: 10px;
+			margin: 15px 0;
+			text-align: left;
+		}
+
+		.info-box p {
+			margin: 8px 0;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.share-section {
+			padding: 20px;
+			border-top: 1px solid #e2e8f0;
+		}
+
+		.share-buttons {
+			display: flex;
+			gap: 10px;
+			margin-top: 15px;
+			flex-wrap: wrap;
+		}
+
+		.share-btn {
+			flex: 1;
+			padding: 10px;
+			border: none;
+			border-radius: 8px;
+			color: white;
+			cursor: pointer;
+			min-width: 100px;
+			font-size: 0.9rem;
+		}
+
+		.facebook { background: #3b5998; }
+		.line { background: #00c300; }
+		.link { background: #718096; }
+
+		.back-section {
+			padding: 20px;
+			text-align: center;
+			border-top: 1px solid #e2e8f0;
+		}
+
+		/* Modal สำหรับแสดงรูปเต็ม */
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1000;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0,0,0,0.9);
+		}
+
+		.modal-content {
+			margin: auto;
+			display: block;
+			max-width: 90%;
+			max-height: 80vh;
+		}
+
+		.close {
+			position: absolute;
+			top: 20px;
+			right: 35px;
+			color: #f1f1f1;
+			font-size: 40px;
+			font-weight: bold;
+			cursor: pointer;
+		}
+
+		@media (max-width: 480px) {
+			.container {
+				border-radius: 10px;
+			}
+			
+			.header h1 {
+				font-size: 1.5rem;
+			}
+			
+			.code-display {
+				font-size: 1.4rem;
+			}
+			
+			.photo-grid {
+				grid-template-columns: repeat(2, 1fr);
+			}
+			
+			.share-buttons {
+				flex-direction: column;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		{% if error %}
+		<div class="error-message">
+			<i class="fas fa-exclamation-triangle"></i>
+			<h2>{{ error }}</h2>
+			<a href="/qr" class="btn btn-primary">กลับไปสแกนใหม่</a>
+		</div>
+		{% else %}
+		<div class="header">
+			<h1><i class="fas fa-images"></i> รูปของคุณพร้อมแล้ว!</h1>
+			<div class="code-display">{{ photo_info.pickup_code }}</div>
+			<p>ดาวน์โหลดรูปได้ด้านล่าง</p>
+		</div>
+
+		<div class="photo-preview">
+			<h3><i class="fas fa-camera"></i> รูปทั้งหมด ({{ photo_info.filenames|length }} รูป)</h3>
+			<div class="photo-grid">
+				{% for filename in photo_info.filenames %}
+				<div class="photo-item" onclick="previewImage('{{ url_for('get_photo', filename=filename) }}')">
+					<img src="{{ url_for('get_photo', filename=filename) }}" 
+						 alt="Photo {{ loop.index }}" 
+						 loading="lazy">
+					<span class="photo-number">{{ loop.index }}</span>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+
+		<div class="download-section">
+			<h3><i class="fas fa-download"></i> ดาวน์โหลดรูป</h3>
+			
+			{% if photo_info.filenames|length > 1 %}
+			<a href="/api/download_all/{{ photo_info.pickup_code }}" class="btn btn-primary">
+				<i class="fas fa-file-archive"></i> ดาวน์โหลดทั้งหมด
+			</a>
+			{% endif %}
+			
+			{% for filename in photo_info.filenames %}
+			<a href="{{ url_for('get_photo', filename=filename) }}" 
+			   download="photobooth_{{ photo_info.pickup_code }}_{{ loop.index }}.png"
+			   class="btn btn-secondary">
+				<i class="fas fa-image"></i> ดาวน์โหลดรูปที่ {{ loop.index }}
+			</a>
+			{% endfor %}
+		</div>
+
+		<div class="info-box">
+			<p><i class="fas fa-clock"></i> ถ่ายเมื่อ: {{ photo_info.time_display }}</p>
+			<p><i class="fas fa-download"></i> ดาวน์โหลดแล้ว: {{ photo_info.download_count }} ครั้ง</p>
+			{% if photo_info.retake_used %}
+			<p><i class="fas fa-redo"></i> ถ่ายใหม่แล้ว 1 ครั้ง</p>
+			{% endif %}
+		</div>
+
+		<div class="share-section">
+			<h3><i class="fas fa-share-alt"></i> แชร์รูป</h3>
+			<div class="share-buttons">
+				<button onclick="shareToFacebook()" class="share-btn facebook">
+					<i class="fab fa-facebook"></i> Facebook
+				</button>
+				<button onclick="shareToLine()" class="share-btn line">
+					<i class="fab fa-line"></i> Line
+				</button>
+				<button onclick="copyLink()" class="share-btn link">
+					<i class="fas fa-link"></i> คัดลอกลิงค์
+				</button>
+			</div>
+		</div>
+		{% endif %}
+	</div>
+
+	<!-- Modal สำหรับแสดงรูปเต็ม -->
+	<div id="imageModal" class="modal" onclick="closeModal()">
+		<span class="close">&times;</span>
+		<img class="modal-content" id="modalImage">
+	</div>
+
+	<script>
+		// สำหรับมือถือ
+		function previewImage(src) {
+			const modal = document.getElementById('imageModal');
+			const modalImg = document.getElementById('modalImage');
+			modal.style.display = "block";
+			modalImg.src = src;
+		}
+
+		function closeModal() {
+			document.getElementById('imageModal').style.display = "none";
+		}
+
+		function shareToFacebook() {
+			const url = encodeURIComponent(window.location.href);
+			window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+		}
+
+		function shareToLine() {
+			const url = encodeURIComponent(window.location.href);
+			const text = encodeURIComponent('รูปจาก Photo Booth');
+			window.open(`https://line.me/R/msg/text/?${text}%20${url}`, '_blank');
+		}
+
+		function copyLink() {
+			const url = window.location.href;
+			navigator.clipboard.writeText(url).then(() => {
+				alert('คัดลอกลิงค์เรียบร้อยแล้ว!');
+			});
+		}
+
+		// ปิด modal เมื่อกด ESC
+		document.addEventListener('keydown', function(event) {
+			if (event.key === 'Escape') {
+				closeModal();
+			}
+		});
+	</script>
+</body>
+</html>

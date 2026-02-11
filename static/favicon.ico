@@ -1,0 +1,8 @@
+# สร้างไฟล์ create_favicon.py
+from PIL import Image
+
+# สร้างภาพขนาด 16x16 พิกเซล
+img = Image.new('RGBA', (16, 16), (102, 126, 234, 255))  # สี #667eea
+img.save('static/favicon.ico', format='ICO')
+
+print("สร้าง favicon.ico สำเร็จ!")

@@ -1,0 +1,27 @@
+{
+  "latest_qr": {
+    "code": "687B7174",
+    "qr_image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAACeElEQVR4nO2bTY6jMBBGXw1IWRopB+ijmBvMkeZMuQEcJQdoCZZIoG8WNoSO1JppDU23R+UFIc5blFSqH3/lmPjI6n98CAfnnXfeeeedd/493vKqgbHGrMl7MK6/tSfa4/zBfJQkDWAtoG40gyBZSyVJ0lv+s+1x/iC+zp9jA/EGghmLWmoxWvrNoJpPssf5z+VTku4boH+R1H2xPc4fy6sLM+qoZO24Vd2vs8f5f+PX/BwEjGCEpQYMCEPa20sg381+5/+K783MrAHi/SLiUIl4r7GWxXInfaY9zh/Ep/h9RKj6BlOK2nGxHNjn2eP8sTy7w08cAMK8FuG3D0lS993sd/4PK/s3eXAmp+b0WJkoKR2R3b+F8Tk/9+1FBpUsfW1Iqdni7ZqOvjrHHueP5XPeTcl3TcNZzkqaViWiPD8Xyq8OHWDVMqqUrtecLalbRUr3b2k8j9DdRW1HjtpUhFM5dv8WyNePVzFeZyO81kQtRopksvDh9bdI/rngPmptitqtsfb8XCS/nx9tb0YYUN9UkIJ4vPp8sGx+a6hS6b3XQJhsN+5vT7XH+WP4fS6OQ5Vbq7weIof3z4XzYTIIUxoISgMQh8XUBYmoyecLhfOV6O2yHyb0TaX1ElaNtefa4/wh/F6/2pTotZ3Obwn082+JfOqf1+xbzcTbRfTN69ZYX2f8/lWx/Jvzb+qv2CZJrPG7xbTHb2H8Tn/eN9FhBp46affv/8D3L5PZr/tFkiZLclYXvH8ulK+fN3L9xYi3BnqrZATXnwvln+9PAmBxaNKewWLqf55mj/PH8vv7V7ngPuovJH3D9atiefP/dzvvvPPOO+/86fxv9DHMsqpBI8kAAAAASUVORK5CYII=",
+    "timestamp": "2026-02-06T05:29:09.846751",
+    "url": "http://us1.bot-hosting.net:21555/scan/687B7174",
+    "time_display": "05:29:09"
+  },
+  "photos": [
+    {
+      "id": "16bc1f6d-c06f-4d50-bc43-50d20a62b4a0",
+      "pickup_code": "687B7174",
+      "filenames": [
+        "20260206_052909_687B7174_1.png"
+      ],
+      "timestamp": "2026-02-06T05:29:09.846681",
+      "time_display": "05:29:09 06/02/2026",
+      "qr_url": "http://us1.bot-hosting.net:21555/scan/687B7174",
+      "download_count": 0
+    }
+  ],
+  "stats": {
+    "total_photos": 1,
+    "total_downloads": 1,
+    "total_sessions": 1
+  }
+}
