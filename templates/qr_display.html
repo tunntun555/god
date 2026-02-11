@@ -1,230 +1,494 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 สแกนเพื่อรับรูป - Photo Booth</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block title %}รับรูปของคุณ - Photo Booth{% endblock %}
+        body {
+            font-family: 'Kanit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 20px;
+        }
 
-{% block content %}
-<div class="qr-page">
-    <div class="qr-header">
-        <h1><i class="fas fa-qrcode"></i> รับรูปของคุณ</h1>
-        <p class="subtitle">สแกน QR Code เพื่อดาวน์โหลดรูปฟรี!</p>
-    </div>
+        /* พื้นหลังเคลื่อนไหว */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            animation: float 25s ease-in-out infinite;
+            pointer-events: none;
+        }
 
-    <div class="qr-container">
-        <div id="qrCodeDisplay">
-            <div class="loading">
-                <i class="fas fa-spinner fa-spin"></i> กำลังโหลด QR Code...
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(3deg); }
+            66% { transform: translate(-20px, 20px) rotate(-3deg); }
+        }
+
+        /* Container หลัก */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            animation: fadeInUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 40px;
+            animation: slideDown 0.8s ease 0.2s both;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            color: white;
+            text-shadow: 
+                0 2px 10px rgba(0, 0, 0, 0.2),
+                0 0 30px rgba(255, 255, 255, 0.3);
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 400;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* QR Container */
+        .qr-container {
+            background: white;
+            border-radius: 30px;
+            padding: clamp(30px, 5vw, 50px);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            margin-bottom: 30px;
+            animation: scaleIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s both;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* QR Code Display */
+        #qrCodeDisplay {
+            min-height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .qr-image {
+            width: 100%;
+            max-width: clamp(250px, 50vw, 400px);
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+            50% { 
+                transform: scale(1.02); 
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            color: #666;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(102, 126, 234, 0.2);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .empty-state h3 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .empty-state p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 400;
+            color: #999;
+        }
+
+        /* Info Section */
+        .info-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: clamp(20px, 4vw, 30px);
+            margin-top: 30px;
+            animation: fadeIn 0.8s ease 0.6s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .qr-code-text {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+        }
+
+        .timestamp {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 400;
+        }
+
+        /* Instructions */
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: clamp(25px, 4vw, 35px);
+            margin-top: 20px;
+            text-align: left;
+            animation: fadeIn 0.8s ease 0.8s both;
+        }
+
+        .instructions h3 {
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .instructions ol {
+            list-style: none;
+            counter-reset: item;
+            padding: 0;
+        }
+
+        .instructions li {
+            counter-increment: item;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: rgba(255, 255, 255, 0.95);
+            margin: 15px 0;
+            padding-left: 45px;
+            position: relative;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .instructions li::before {
+            content: counter(item);
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #FFE66D, #FF8B42);
+            color: #333;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Scan Text */
+        .scan-text {
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            color: #333;
+            font-weight: 600;
+            margin-top: 20px;
+            animation: slideUp 0.6s ease 0.6s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .qr-container {
+                padding: 25px;
+            }
+
+            .instructions li {
+                padding-left: 40px;
+            }
+
+            .instructions li::before {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                letter-spacing: -0.5px;
+            }
+
+            .qr-container {
+                padding: 20px;
+                border-radius: 20px;
+            }
+
+            .instructions {
+                padding: 20px;
+            }
+
+            .info-section {
+                padding: 20px;
+            }
+        }
+
+        /* Landscape mode for small devices */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .header {
+                margin-bottom: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .qr-container {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+
+            .info-section,
+            .instructions {
+                margin-top: 15px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📱 รับรูปของคุณ</h1>
+            <p>สแกน QR Code เพื่อดาวน์โหลดรูปฟรี!</p>
+        </div>
+
+        <!-- QR Container -->
+        <div class="qr-container">
+            <div id="qrCodeDisplay">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <span>กำลังโหลด QR Code...</span>
+                </div>
             </div>
+            <p class="scan-text" id="scanText" style="display: none;">✨ สแกนด้วยมือถือของคุณ</p>
         </div>
 
-        <div class="qr-info">
-            <h3 id="latestCode">รอการถ่ายรูป...</h3>
-            <p class="timestamp" id="latestTime"></p>
+        <!-- Info Section -->
+        <div class="info-section" id="infoSection" style="display: none;">
+            <div class="qr-code-text" id="codeText">รหัส: ------</div>
+            <div class="timestamp" id="timeText">รอการถ่ายรูป...</div>
         </div>
 
+        <!-- Instructions -->
         <div class="instructions">
-            <h3><i class="fas fa-mobile-alt"></i> วิธีรับรูป:</h3>
+            <h3>🎯 วิธีรับรูป</h3>
             <ol>
                 <li>เปิดแอปกล้องหรือแอปสแกน QR บนมือถือ</li>
-                <li>สแกน QR Code นี้</li>
-                <li>กดลิ้งค์ที่ปรากฏ</li>
-                <li>ดาวน์โหลดรูปได้ทันที!</li>
+                <li>สแกน QR Code ที่แสดงด้านบน</li>
+                <li>กดลิงก์ที่ปรากฏบนหน้าจอ</li>
+                <li>ดาวน์โหลดรูปได้ทันที! 🎉</li>
             </ol>
         </div>
     </div>
 
-    <div class="stats">
-        <div class="stat-item">
-            <i class="fas fa-camera"></i>
-            <span id="totalPhotos">0</span>
-            <small>รูปทั้งหมด</small>
-        </div>
-        <div class="stat-item">
-            <i class="fas fa-download"></i>
-            <span id="totalDownloads">0</span>
-            <small>ดาวน์โหลด</small>
-        </div>
-        <div class="stat-item">
-            <i class="fas fa-users"></i>
-            <span id="totalSessions">0</span>
-            <small>เซสชัน</small>
-        </div>
-    </div>
-</div>
+    <script>
+        // Elements
+        const qrContainer = document.getElementById('qrCodeDisplay');
+        const codeText = document.getElementById('codeText');
+        const timeText = document.getElementById('timeText');
+        const scanText = document.getElementById('scanText');
+        const infoSection = document.getElementById('infoSection');
 
-<script>
-// QR Display Auto-Update
-document.addEventListener('DOMContentLoaded', function() {
-    const qrContainer = document.getElementById('qrCodeDisplay');
-    const latestCode = document.getElementById('latestCode');
-    const latestTime = document.getElementById('latestTime');
-    const totalPhotos = document.getElementById('totalPhotos');
-    const totalDownloads = document.getElementById('totalDownloads');
-    const totalSessions = document.getElementById('totalSessions');
-
-    // ดึงข้อมูลล่าสุดทุก 3 วินาที
-    async function updateQR() {
-        try {
-            const response = await fetch('/api/latest_qr');
-            const data = await response.json();
-            
-            if (data && data.qr_image) {
-                qrContainer.innerHTML = `
-                    <img src="${data.qr_image}" alt="QR Code" class="qr-image">
-                    <p class="scan-text">สแกนด้วยมือถือ</p>
-                `;
-                latestCode.textContent = `รหัส: ${data.code}`;
-                latestTime.textContent = `เวลา: ${data.time_display || 'ล่าสุด'}`;
-            } else {
+        // Update QR Code
+        async function updateQR() {
+            try {
+                const response = await fetch('/api/latest_qr');
+                const data = await response.json();
+                
+                if (data && data.qr_image) {
+                    // แสดง QR Code
+                    qrContainer.innerHTML = `
+                        <img src="${data.qr_image}" alt="QR Code" class="qr-image">
+                    `;
+                    
+                    // แสดงข้อมูล
+                    codeText.textContent = `รหัส: ${data.code}`;
+                    timeText.textContent = `เวลา: ${data.time_display || 'ล่าสุด'}`;
+                    scanText.style.display = 'block';
+                    infoSection.style.display = 'block';
+                } else {
+                    // ไม่มีรูป - แสดงสถานะรอ
+                    qrContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📸</div>
+                            <h3>รอการถ่ายรูป...</h3>
+                            <p>QR Code จะปรากฏเมื่อมีการถ่ายรูป</p>
+                        </div>
+                    `;
+                    scanText.style.display = 'none';
+                    infoSection.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error fetching QR:', error);
                 qrContainer.innerHTML = `
                     <div class="empty-state">
-                        <i class="fas fa-qrcode"></i>
-                        <h3>รอการถ่ายรูป...</h3>
-                        <p>ยังไม่มีรูปที่ถ่ายในระบบ</p>
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3>ไม่สามารถโหลดได้</h3>
+                        <p>กำลังลองใหม่...</p>
                     </div>
                 `;
-                latestCode.textContent = 'รอการถ่ายรูป...';
-                latestTime.textContent = '';
             }
-        } catch (error) {
-            console.error('Error fetching QR:', error);
         }
-    }
 
-    // ดึงสถิติ
-    async function updateStats() {
-        try {
-            const response = await fetch('/admin?json=true');
-            const data = await response.json();
-            if (data.stats) {
-                totalPhotos.textContent = data.stats.total_photos;
-                totalDownloads.textContent = data.stats.total_downloads;
-                totalSessions.textContent = data.stats.total_sessions;
-            }
-        } catch (error) {
-            console.error('Error fetching stats:', error);
-        }
-    }
+        // Auto-update every 3 seconds
+        setInterval(updateQR, 3000);
 
-    // อัปเดตทุก 3 วินาที
-    setInterval(updateQR, 3000);
-    setInterval(updateStats, 5000);
-    
-    // โหลดครั้งแรก
-    updateQR();
-    updateStats();
-
-    // Fullscreen suggestion
-    if (document.documentElement.requestFullscreen) {
-        document.querySelector('.qr-page').addEventListener('click', function() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            }
+        // Load on page ready
+        document.addEventListener('DOMContentLoaded', function() {
+            updateQR();
         });
-        
-        // แสดงข้อความแนะนำ Fullscreen
-        setTimeout(() => {
-            const hint = document.createElement('div');
-            hint.className = 'fullscreen-hint';
-            hint.innerHTML = 'คลิกที่จอเพื่อเปิด Fullscreen';
-            document.querySelector('.qr-page').appendChild(hint);
-            setTimeout(() => hint.remove(), 5000);
-        }, 2000);
-    }
-});
-</script>
 
-<style>
-.qr-page { 
-    height: 100vh; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    text-align: center;
-    padding: 20px;
-}
-.qr-header { margin-bottom: 30px; }
-.qr-header h1 { font-size: 3rem; margin-bottom: 10px; }
-.subtitle { font-size: 1.5rem; opacity: 0.9; }
-.qr-container { 
-    background: white; 
-    padding: 30px; 
-    border-radius: 20px; 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    margin-bottom: 30px;
-    max-width: 90vw;
-}
-.qr-image { 
-    width: 400px; 
-    height: 400px; 
-    max-width: 80vw; 
-    max-height: 80vw;
-    border: 10px solid white;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-.scan-text { 
-    color: #333; 
-    font-size: 1.5rem; 
-    margin-top: 15px; 
-    font-weight: bold;
-}
-.qr-info { 
-    background: rgba(255,255,255,0.1); 
-    padding: 15px; 
-    border-radius: 10px; 
-    margin-top: 20px;
-}
-#latestCode { font-size: 1.8rem; margin: 10px 0; }
-.timestamp { font-size: 1.2rem; opacity: 0.8; }
-.instructions { 
-    background: rgba(255,255,255,0.1); 
-    padding: 20px; 
-    border-radius: 10px; 
-    margin-top: 20px;
-    text-align: left;
-    max-width: 500px;
-}
-.instructions ol { padding-left: 20px; margin-top: 10px; }
-.instructions li { margin: 8px 0; }
-.stats { 
-    display: flex; 
-    gap: 30px; 
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-.stat-item { 
-    background: rgba(255,255,255,0.1); 
-    padding: 15px 25px; 
-    border-radius: 10px;
-    min-width: 120px;
-}
-.stat-item i { font-size: 2rem; display: block; margin-bottom: 10px; }
-.stat-item span { font-size: 2rem; font-weight: bold; display: block; }
-.stat-item small { opacity: 0.8; }
-.empty-state { padding: 40px; color: #666; }
-.empty-state i { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
-.loading { padding: 40px; font-size: 1.5rem; }
-.fullscreen-hint {
-    position: fixed;
-    bottom: 20px;
-    background: rgba(0,0,0,0.7);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    animation: fadeInOut 5s;
-}
-@keyframes fadeInOut {
-    0%, 100% { opacity: 0; }
-    20%, 80% { opacity: 1; }
-}
-
-@media (max-height: 800px) {
-    .qr-image { width: 300px; height: 300px; }
-    .qr-header h1 { font-size: 2rem; }
-    .subtitle { font-size: 1.2rem; }
-}
-</style>
-{% endblock %}
+        // Optional: Fullscreen on click (for presentation mode)
+        let clickCount = 0;
+        document.body.addEventListener('click', function() {
+            clickCount++;
+            if (clickCount === 3 && document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+                clickCount = 0;
+            }
+            setTimeout(() => { clickCount = 0; }, 2000);
+        });
+    </script>
+</body>
+</html>
