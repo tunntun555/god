@@ -1,356 +1,582 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>รับรูปของคุณ - Photo Booth</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-	<style>
-		* {
-			margin: 0;
-			padding: 0;
-			box-sizing: border-box;
-		}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📸 รับรูปของคุณ - Photo Booth</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-		body {
-			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			min-height: 100vh;
-			color: #333;
-			padding: 20px;
-		}
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-		.container {
-			max-width: 500px;
-			margin: 0 auto;
-			background: white;
-			border-radius: 20px;
-			overflow: hidden;
-			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-		}
+        /* Background Animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+            animation: float 25s ease-in-out infinite;
+            pointer-events: none;
+        }
 
-		.header {
-			text-align: center;
-			padding: 30px 20px;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			color: white;
-		}
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(30px, -30px) rotate(3deg); }
+        }
 
-		.header h1 {
-			font-size: 2rem;
-			margin-bottom: 10px;
-		}
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s ease;
+        }
 
-		.code-display {
-			font-size: 1.8rem;
-			font-weight: bold;
-			background: rgba(255, 255, 255, 0.2);
-			padding: 10px 20px;
-			border-radius: 10px;
-			margin: 15px auto;
-			display: inline-block;
-			font-family: monospace;
-			letter-spacing: 2px;
-		}
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-		.error-message {
-			text-align: center;
-			padding: 50px 20px;
-			color: #f56565;
-		}
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 30px 30px 0 0;
+            padding: clamp(30px, 5vw, 40px);
+            text-align: center;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+        }
 
-		.error-message i {
-			font-size: 4rem;
-			margin-bottom: 20px;
-		}
+        .header h1 {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
 
-		.photo-preview {
-			padding: 20px;
-			background: #f7fafc;
-		}
+        .code-display {
+            display: inline-block;
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 5px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
 
-		.photo-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-			gap: 10px;
-			margin-top: 15px;
-		}
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
 
-		.photo-item {
-			position: relative;
-			border-radius: 10px;
-			overflow: hidden;
-			box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-		}
+        .header p {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: #666;
+            font-weight: 500;
+        }
 
-		.photo-item img {
-			width: 100%;
-			height: 120px;
-			object-fit: cover;
-			display: block;
-		}
+        /* Content */
+        .content {
+            background: white;
+            padding: clamp(25px, 5vw, 35px);
+        }
 
-		.photo-number {
-			position: absolute;
-			top: 5px;
-			right: 5px;
-			background: rgba(0,0,0,0.7);
-			color: white;
-			padding: 3px 8px;
-			border-radius: 50%;
-			font-size: 0.8rem;
-		}
+        .section-title {
+            font-size: clamp(1.3rem, 4vw, 1.6rem);
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-		.download-section {
-			padding: 25px;
-			text-align: center;
-		}
+        /* Photo Grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
 
-		.btn {
-			display: block;
-			width: 100%;
-			padding: 15px;
-			margin: 10px 0;
-			border: none;
-			border-radius: 10px;
-			font-size: 1.1rem;
-			font-weight: bold;
-			cursor: pointer;
-			transition: all 0.3s;
-			text-decoration: none;
-			text-align: center;
-		}
+        .photo-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
 
-		.btn-primary {
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			color: white;
-		}
+        .photo-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
 
-		.btn-secondary {
-			background: #48bb78;
-			color: white;
-		}
+        .photo-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
 
-		.btn:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-		}
+        .photo-number {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
 
-		.info-box {
-			background: #f8f9fa;
-			padding: 15px;
-			border-radius: 10px;
-			margin: 15px 0;
-			text-align: left;
-		}
+        /* Download Buttons */
+        .download-section {
+            margin-bottom: 25px;
+        }
 
-		.info-box p {
-			margin: 8px 0;
-			display: flex;
-			align-items: center;
-			gap: 10px;
-		}
+        .btn {
+            display: block;
+            width: 100%;
+            padding: clamp(15px, 3vw, 18px);
+            margin: 12px 0;
+            border: none;
+            border-radius: 15px;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            font-family: 'Kanit', sans-serif;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
 
-		.share-section {
-			padding: 20px;
-			border-top: 1px solid #e2e8f0;
-		}
+        .btn:active {
+            transform: scale(0.98);
+        }
 
-		.share-buttons {
-			display: flex;
-			gap: 10px;
-			margin-top: 15px;
-			flex-wrap: wrap;
-		}
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
 
-		.share-btn {
-			flex: 1;
-			padding: 10px;
-			border: none;
-			border-radius: 8px;
-			color: white;
-			cursor: pointer;
-			min-width: 100px;
-			font-size: 0.9rem;
-		}
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5568d3, #6a4190);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
 
-		.facebook { background: #3b5998; }
-		.line { background: #00c300; }
-		.link { background: #718096; }
+        .btn-secondary {
+            background: linear-gradient(135deg, #51CF66, #38B553);
+            color: white;
+        }
 
-		.back-section {
-			padding: 20px;
-			text-align: center;
-			border-top: 1px solid #e2e8f0;
-		}
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #46ba5c, #2fa347);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(81, 207, 102, 0.3);
+        }
 
-		/* Modal สำหรับแสดงรูปเต็ม */
-		.modal {
-			display: none;
-			position: fixed;
-			z-index: 1000;
-			left: 0;
-			top: 0;
-			width: 100%;
-			height: 100%;
-			background-color: rgba(0,0,0,0.9);
-		}
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: clamp(15px, 4vw, 20px);
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+        }
 
-		.modal-content {
-			margin: auto;
-			display: block;
-			max-width: 90%;
-			max-height: 80vh;
-		}
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            color: #555;
+        }
 
-		.close {
-			position: absolute;
-			top: 20px;
-			right: 35px;
-			color: #f1f1f1;
-			font-size: 40px;
-			font-weight: bold;
-			cursor: pointer;
-		}
+        .info-icon {
+            font-size: 1.2rem;
+        }
 
-		@media (max-width: 480px) {
-			.container {
-				border-radius: 10px;
-			}
-			
-			.header h1 {
-				font-size: 1.5rem;
-			}
-			
-			.code-display {
-				font-size: 1.4rem;
-			}
-			
-			.photo-grid {
-				grid-template-columns: repeat(2, 1fr);
-			}
-			
-			.share-buttons {
-				flex-direction: column;
-			}
-		}
-	</style>
+        /* Footer */
+        .footer {
+            background: white;
+            border-radius: 0 0 30px 30px;
+            padding: clamp(20px, 4vw, 30px);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer p {
+            color: #999;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            margin-bottom: 15px;
+        }
+
+        /* Share Buttons */
+        .share-section {
+            margin-top: 20px;
+        }
+
+        .share-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .share-btn {
+            padding: clamp(12px, 3vw, 15px);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            font-weight: 600;
+            font-family: 'Kanit', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .share-btn:active {
+            transform: scale(0.98);
+        }
+
+        .facebook { background: linear-gradient(135deg, #3b5998, #2d4373); }
+        .line { background: linear-gradient(135deg, #00c300, #00aa00); }
+        .link { background: linear-gradient(135deg, #718096, #4a5568); }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: white;
+            font-size: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            transform: scale(1.1);
+        }
+
+        /* Error State */
+        .error-message {
+            text-align: center;
+            padding: 60px 30px;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .error-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .error-message h2 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            color: #e74c3c;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                border-radius: 20px;
+            }
+
+            .header {
+                border-radius: 20px 20px 0 0;
+            }
+
+            .footer {
+                border-radius: 0 0 20px 20px;
+            }
+
+            .photo-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .photo-item img {
+                height: 120px;
+            }
+
+            .share-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-	<div class="container">
-		{% if error %}
-		<div class="error-message">
-			<i class="fas fa-exclamation-triangle"></i>
-			<h2>{{ error }}</h2>
-			<a href="/qr" class="btn btn-primary">กลับไปสแกนใหม่</a>
-		</div>
-		{% else %}
-		<div class="header">
-			<h1><i class="fas fa-images"></i> รูปของคุณพร้อมแล้ว!</h1>
-			<div class="code-display">{{ photo_info.pickup_code }}</div>
-			<p>ดาวน์โหลดรูปได้ด้านล่าง</p>
-		</div>
+    <div class="container">
+        {% if error %}
+        <div class="error-message">
+            <div class="error-icon">⚠️</div>
+            <h2>{{ error }}</h2>
+            <a href="/" class="btn btn-primary" style="max-width: 300px; margin: 20px auto 0;">กลับหน้าแรก</a>
+        </div>
+        {% else %}
+        <!-- Header -->
+        <div class="header">
+            <h1>🎉 รูปของคุณพร้อมแล้ว!</h1>
+            <div class="code-display">{{ photo_info.pickup_code }}</div>
+            <p>ดาวน์โหลดรูปได้ด้านล่าง</p>
+        </div>
 
-		<div class="photo-preview">
-			<h3><i class="fas fa-camera"></i> รูปทั้งหมด ({{ photo_info.filenames|length }} รูป)</h3>
-			<div class="photo-grid">
-				{% for filename in photo_info.filenames %}
-				<div class="photo-item" onclick="previewImage('{{ url_for('get_photo', filename=filename) }}')">
-					<img src="{{ url_for('get_photo', filename=filename) }}" 
-						 alt="Photo {{ loop.index }}" 
-						 loading="lazy">
-					<span class="photo-number">{{ loop.index }}</span>
-				</div>
-				{% endfor %}
-			</div>
-		</div>
+        <!-- Content -->
+        <div class="content">
+            <!-- Photo Preview -->
+            <div class="section-title">
+                📸 รูปทั้งหมด ({{ photo_info.filenames|length }} รูป)
+            </div>
+            <div class="photo-grid">
+                {% for filename in photo_info.filenames %}
+                <div class="photo-item" onclick="previewImage('{{ url_for('get_photo', filename=filename) }}')">
+                    <img src="{{ url_for('get_photo', filename=filename) }}" 
+                         alt="Photo {{ loop.index }}" 
+                         loading="lazy">
+                    <div class="photo-number">{{ loop.index }}</div>
+                </div>
+                {% endfor %}
+            </div>
 
-		<div class="download-section">
-			<h3><i class="fas fa-download"></i> ดาวน์โหลดรูป</h3>
-			
-			{% if photo_info.filenames|length > 1 %}
-			<a href="/api/download_all/{{ photo_info.pickup_code }}" class="btn btn-primary">
-				<i class="fas fa-file-archive"></i> ดาวน์โหลดทั้งหมด
-			</a>
-			{% endif %}
-			
-			{% for filename in photo_info.filenames %}
-			<a href="{{ url_for('get_photo', filename=filename) }}" 
-			   download="photobooth_{{ photo_info.pickup_code }}_{{ loop.index }}.png"
-			   class="btn btn-secondary">
-				<i class="fas fa-image"></i> ดาวน์โหลดรูปที่ {{ loop.index }}
-			</a>
-			{% endfor %}
-		</div>
+            <!-- Download Section -->
+            <div class="download-section">
+                <div class="section-title">💾 ดาวน์โหลดรูป</div>
+                
+                {% if photo_info.filenames|length > 1 %}
+                <a href="/api/download_all/{{ photo_info.pickup_code }}" class="btn btn-primary">
+                    📦 ดาวน์โหลดทั้งหมด (ZIP)
+                </a>
+                {% endif %}
+                
+                {% for filename in photo_info.filenames %}
+                <a href="{{ url_for('get_photo', filename=filename) }}" 
+                   download="photobooth_{{ photo_info.pickup_code }}_{{ loop.index }}.png"
+                   class="btn btn-secondary">
+                    🖼️ ดาวน์โหลดรูปที่ {{ loop.index }}
+                </a>
+                {% endfor %}
+            </div>
 
-		<div class="info-box">
-			<p><i class="fas fa-clock"></i> ถ่ายเมื่อ: {{ photo_info.time_display }}</p>
-			<p><i class="fas fa-download"></i> ดาวน์โหลดแล้ว: {{ photo_info.download_count }} ครั้ง</p>
-			{% if photo_info.retake_used %}
-			<p><i class="fas fa-redo"></i> ถ่ายใหม่แล้ว 1 ครั้ง</p>
-			{% endif %}
-		</div>
+            <!-- Info Box -->
+            <div class="info-box">
+                <div class="info-item">
+                    <span class="info-icon">🕒</span>
+                    <span>ถ่ายเมื่อ: {{ photo_info.time_display }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📥</span>
+                    <span>ดาวน์โหลดแล้ว: {{ photo_info.download_count }} ครั้ง</span>
+                </div>
+                {% if photo_info.retake_used %}
+                <div class="info-item">
+                    <span class="info-icon">🔄</span>
+                    <span>ถ่ายใหม่แล้ว 1 ครั้ง</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
 
-		<div class="share-section">
-			<h3><i class="fas fa-share-alt"></i> แชร์รูป</h3>
-			<div class="share-buttons">
-				<button onclick="shareToFacebook()" class="share-btn facebook">
-					<i class="fab fa-facebook"></i> Facebook
-				</button>
-				<button onclick="shareToLine()" class="share-btn line">
-					<i class="fab fa-line"></i> Line
-				</button>
-				<button onclick="copyLink()" class="share-btn link">
-					<i class="fas fa-link"></i> คัดลอกลิงค์
-				</button>
-			</div>
-		</div>
-		{% endif %}
-	</div>
+        <!-- Footer -->
+        <div class="footer">
+            <p>แชร์รูปให้เพื่อนของคุณ! 🎊</p>
+            
+            <div class="share-section">
+                <div class="share-buttons">
+                    <button onclick="shareToFacebook()" class="share-btn facebook">
+                        📘 Facebook
+                    </button>
+                    <button onclick="shareToLine()" class="share-btn line">
+                        💚 Line
+                    </button>
+                    <button onclick="copyLink()" class="share-btn link">
+                        🔗 คัดลอกลิงก์
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 
-	<!-- Modal สำหรับแสดงรูปเต็ม -->
-	<div id="imageModal" class="modal" onclick="closeModal()">
-		<span class="close">&times;</span>
-		<img class="modal-content" id="modalImage">
-	</div>
+    <!-- Modal -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
 
-	<script>
-		// สำหรับมือถือ
-		function previewImage(src) {
-			const modal = document.getElementById('imageModal');
-			const modalImg = document.getElementById('modalImage');
-			modal.style.display = "block";
-			modalImg.src = src;
-		}
+    <script>
+        // Preview Image
+        function previewImage(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = "block";
+            modalImg.src = src;
+        }
 
-		function closeModal() {
-			document.getElementById('imageModal').style.display = "none";
-		}
+        function closeModal() {
+            document.getElementById('imageModal').style.display = "none";
+        }
 
-		function shareToFacebook() {
-			const url = encodeURIComponent(window.location.href);
-			window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-		}
+        // Share Functions
+        function shareToFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        }
 
-		function shareToLine() {
-			const url = encodeURIComponent(window.location.href);
-			const text = encodeURIComponent('รูปจาก Photo Booth');
-			window.open(`https://line.me/R/msg/text/?${text}%20${url}`, '_blank');
-		}
+        function shareToLine() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('รูปจาก Photo Booth 📸');
+            window.open(`https://line.me/R/msg/text/?${text}%20${url}`, '_blank');
+        }
 
-		function copyLink() {
-			const url = window.location.href;
-			navigator.clipboard.writeText(url).then(() => {
-				alert('คัดลอกลิงค์เรียบร้อยแล้ว!');
-			});
-		}
+        function copyLink() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                // Show toast notification
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 30px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: linear-gradient(135deg, #51CF66, #38B553);
+                    color: white;
+                    padding: 15px 30px;
+                    border-radius: 50px;
+                    font-weight: 600;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                    z-index: 2000;
+                    animation: slideUp 0.3s ease;
+                `;
+                toast.textContent = '✅ คัดลอกลิงก์เรียบร้อย!';
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 2000);
+            }).catch(() => {
+                alert('ไม่สามารถคัดลอกได้ กรุณาลองใหม่');
+            });
+        }
 
-		// ปิด modal เมื่อกด ESC
-		document.addEventListener('keydown', function(event) {
-			if (event.key === 'Escape') {
-				closeModal();
-			}
-		});
-	</script>
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Add slide up animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translate(-50%, 20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translate(-50%, 0);
+                }
+            }
+            @keyframes fadeOut {
+                to {
+                    opacity: 0;
+                    transform: translate(-50%, -20px);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
