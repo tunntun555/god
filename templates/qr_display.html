@@ -430,6 +430,24 @@
         const scanText = document.getElementById('scanText');
         const infoSection = document.getElementById('infoSection');
 
+        // Heartbeat - ส่งสัญญาณว่ายังใช้งานอยู่
+        async function sendHeartbeat() {
+            try {
+                await fetch('/api/heartbeat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ page_type: 'qr' })
+                });
+            } catch (error) {
+                console.error('Heartbeat error:', error);
+            }
+        }
+
+        // ส่ง heartbeat ทุก 30 วินาที
+        setInterval(sendHeartbeat, 30000);
+
         // Update QR Code
         async function updateQR() {
             try {
@@ -477,6 +495,7 @@
         // Load on page ready
         document.addEventListener('DOMContentLoaded', function() {
             updateQR();
+            sendHeartbeat(); // ส่ง heartbeat ครั้งแรก
         });
 
         // Optional: Fullscreen on click (for presentation mode)
