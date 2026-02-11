@@ -4,248 +4,98 @@
 
 {% block content %}
 <div class="admin-page">
-    <!-- Header Section -->
-    <header class="admin-header">
-        <div class="header-content">
-            <h1><i class="fas fa-cog"></i> Photo Booth Admin</h1>
-            <p class="subtitle">จัดการระบบสำหรับงานอีเวนต์</p>
-        </div>
+    <!-- Header -->
+    <div class="admin-header">
+        <h1><i class="fas fa-cog"></i> Photo Booth Admin</h1>
+        <p>จัดการระบบสำหรับงานอีเวนต์</p>
         <div class="server-info">
-            <span class="info-item">
-                <i class="fas fa-server"></i> us1.bot-hosting.net:21555
-            </span>
-            <span class="info-item">
-                <i class="fas fa-clock"></i> 
-                <span id="serverTime">กำลังโหลด...</span>
-            </span>
+            <span><i class="fas fa-server"></i> us1.bot-hosting.net:21555</span>
+            <span><i class="fas fa-clock"></i> <span id="serverTime">โหลดเวลา...</span></span>
         </div>
-    </header>
+    </div>
 
-    <!-- System Status Section -->
-    <section class="system-status">
-        <h2 class="section-title">
-            <i class="fas fa-heartbeat"></i> สถานะระบบ
-        </h2>
+    <!-- System Status -->
+    <div class="system-status">
+        <h2><i class="fas fa-heartbeat"></i> สถานะระบบ</h2>
         <div class="status-grid">
-            <div class="status-card status-online">
-                <i class="fas fa-plug status-icon"></i>
+            <div class="status-card online">
+                <i class="fas fa-plug"></i>
                 <h3>เซิร์ฟเวอร์</h3>
-                <span class="status-badge">ONLINE</span>
+                <div class="status-text">ONLINE</div>
             </div>
-            
-            <div class="status-card {% if camera_locked %}status-locked{% else %}status-unlocked{% endif %}">
-                <i class="fas fa-camera status-icon"></i>
+            <div class="status-card {% if camera_locked %}locked{% else %}unlocked{% endif %}">
+                <i class="fas fa-camera"></i>
                 <h3>เครื่องถ่ายรูป</h3>
-                <span class="status-badge">
-                    {% if camera_locked %}LOCKED{% else %}UNLOCKED{% endif %}
-                </span>
+                <div class="status-text">
+                    {% if camera_locked %}
+                    LOCKED
+                    {% else %}
+                    UNLOCKED
+                    {% endif %}
+                </div>
             </div>
-            
-            <div class="status-card status-active">
-                <i class="fas fa-qrcode status-icon"></i>
+            <div class="status-card active">
+                <i class="fas fa-qrcode"></i>
                 <h3>QR Display</h3>
-                <span class="status-badge">ACTIVE</span>
+                <div class="status-text">ACTIVE</div>
             </div>
-            
-            <div class="status-card status-normal">
-                <i class="fas fa-database status-icon"></i>
+            <div class="status-card normal">
+                <i class="fas fa-database"></i>
                 <h3>ฐานข้อมูล</h3>
-                <span class="status-badge">NORMAL</span>
+                <div class="status-text">NORMAL</div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Statistics Section -->
-    <section class="statistics-section">
-        <h2 class="section-title">
-            <i class="fas fa-chart-bar"></i> สถิติการใช้งาน
-        </h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-camera"></i>
-                </div>
-                <div class="stat-content">
-                    <h3>รูปทั้งหมด</h3>
-                    <div class="stat-number">{{ stats.total_photos|default(0) }}</div>
-                    <div class="stat-sub">รูปภาพ</div>
-                </div>
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-camera"></i>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-download"></i>
-                </div>
-                <div class="stat-content">
-                    <h3>ดาวน์โหลด</h3>
-                    <div class="stat-number">{{ stats.total_downloads|default(0) }}</div>
-                    <div class="stat-sub">ครั้ง</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="stat-content">
-                    <h3>เซสชัน</h3>
-                    <div class="stat-number">{{ stats.total_sessions|default(0) }}</div>
-                    <div class="stat-sub">คน</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-redo"></i>
-                </div>
-                <div class="stat-content">
-                    <h3>ถ่ายใหม่</h3>
-                    <div class="stat-number">{{ stats.retake_used|default(0) }}</div>
-                    <div class="stat-sub">ครั้ง</div>
-                </div>
+            <div class="stat-content">
+                <h3>รูปทั้งหมด</h3>
+                <div class="stat-number">{{ stats.total_photos }}</div>
+                <div class="stat-sub">รูปภาพ</div>
             </div>
         </div>
-    </section>
-
-    <!-- Device Management Section -->
-    <section class="device-management">
-        <h2 class="section-title">
-            <i class="fas fa-desktop"></i> จัดการเครื่องใช้งาน
-        </h2>
-        
-        <div class="device-grid">
-            <!-- Capture Devices -->
-            <article class="device-card">
-                <header class="card-header">
-                    <h3><i class="fas fa-camera"></i> หน้าถ่ายรูป</h3>
-                </header>
-                
-                <div class="card-body">
-                    <div class="usage-display">
-                        <div class="progress-bar">
-                            <div class="progress-fill" data-type="capture" 
-                                 style="width: {{ (active_capture|default(0) / settings.max_capture_devices * 100) if settings.max_capture_devices > 0 else 0 }}%">
-                            </div>
-                        </div>
-                        <div class="usage-text">
-                            <span class="current-count">{{ active_capture|default(0) }}</span> / 
-                            <span class="max-count">{{ settings.max_capture_devices|default(5) }}</span> 
-                            <span class="unit">เครื่อง</span>
-                        </div>
-                    </div>
-                    
-                    <div class="device-settings">
-                        <label for="maxCaptureDevices">
-                            <i class="fas fa-sliders-h"></i> จำนวนเครื่องสูงสุด
-                        </label>
-                        <select id="maxCaptureDevices" class="setting-select">
-                            <option value="1" {% if settings.max_capture_devices == 1 %}selected{% endif %}>1 เครื่อง</option>
-                            <option value="2" {% if settings.max_capture_devices == 2 %}selected{% endif %}>2 เครื่อง</option>
-                            <option value="3" {% if settings.max_capture_devices == 3 %}selected{% endif %}>3 เครื่อง</option>
-                            <option value="5" {% if settings.max_capture_devices == 5 %}selected{% endif %}>5 เครื่อง</option>
-                            <option value="10" {% if settings.max_capture_devices == 10 %}selected{% endif %}>10 เครื่อง</option>
-                            <option value="999" {% if settings.max_capture_devices == 999 %}selected{% endif %}>ไม่จำกัด</option>
-                        </select>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button onclick="DeviceManager.saveLimits()" class="btn btn-primary">
-                            <i class="fas fa-save"></i> บันทึก
-                        </button>
-                        <button onclick="DeviceManager.kickAll('capture')" class="btn btn-warning">
-                            <i class="fas fa-sign-out-alt"></i> ไล่ออก
-                        </button>
-                    </div>
-
-                    <div id="captureSessionList" class="session-list"></div>
-                </div>
-            </article>
-
-            <!-- QR Display Devices -->
-            <article class="device-card">
-                <header class="card-header">
-                    <h3><i class="fas fa-qrcode"></i> หน้าแสดง QR</h3>
-                </header>
-                
-                <div class="card-body">
-                    <div class="usage-display">
-                        <div class="progress-bar">
-                            <div class="progress-fill" data-type="qr" 
-                                 style="width: {{ (active_qr|default(0) / settings.max_qr_devices * 100) if settings.max_qr_devices > 0 else 0 }}%">
-                            </div>
-                        </div>
-                        <div class="usage-text">
-                            <span class="current-count">{{ active_qr|default(0) }}</span> / 
-                            <span class="max-count">{{ settings.max_qr_devices|default(3) }}</span> 
-                            <span class="unit">เครื่อง</span>
-                        </div>
-                    </div>
-                    
-                    <div class="device-settings">
-                        <label for="maxQrDevices">
-                            <i class="fas fa-sliders-h"></i> จำนวนเครื่องสูงสุด
-                        </label>
-                        <select id="maxQrDevices" class="setting-select">
-                            <option value="1" {% if settings.max_qr_devices|int == 1 %}selected{% endif %}>1 เครื่อง</option>
-                            <option value="2" {% if settings.max_qr_devices == 2 %}selected{% endif %}>2 เครื่อง</option>
-                            <option value="3" {% if settings.max_qr_devices == 3 %}selected{% endif %}>3 เครื่อง</option>
-                            <option value="5" {% if settings.max_qr_devices == 5 %}selected{% endif %}>5 เครื่อง</option>
-                            <option value="10" {% if settings.max_qr_devices == 10 %}selected{% endif %}>10 เครื่อง</option>
-                            <option value="999" {% if settings.max_qr_devices == 999 %}selected{% endif %}>ไม่จำกัด</option>
-                        </select>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button onclick="DeviceManager.saveLimits()" class="btn btn-primary">
-                            <i class="fas fa-save"></i> บันทึก
-                        </button>
-                        <button onclick="DeviceManager.kickAll('qr')" class="btn btn-warning">
-                            <i class="fas fa-sign-out-alt"></i> ไล่ออก
-                        </button>
-                    </div>
-
-                    <div id="qrSessionList" class="session-list"></div>
-                </div>
-            </article>
-
-            <!-- Session Management -->
-            <article class="device-card">
-                <header class="card-header">
-                    <h3><i class="fas fa-users-cog"></i> จัดการ Session</h3>
-                </header>
-                
-                <div class="card-body">
-                    <div class="info-panel">
-                        <p><i class="fas fa-info-circle"></i> Session หมดอายุอัตโนมัติหลัง 30 นาที</p>
-                        <p><i class="fas fa-sync"></i> ระบบตรวจสอบและล้างอัตโนมัติ</p>
-                    </div>
-                    
-                    <div class="session-stats">
-                        <div class="stat-item">
-                            <i class="fas fa-camera"></i>
-                            <span>Capture: <strong id="captureCount">{{ active_capture|default(0) }}</strong></span>
-                        </div>
-                        <div class="stat-item">
-                            <i class="fas fa-qrcode"></i>
-                            <span>QR: <strong id="qrCount">{{ active_qr|default(0) }}</strong></span>
-                        </div>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button onclick="SessionManager.refresh()" class="btn btn-info">
-                            <i class="fas fa-sync"></i> รีเฟรช
-                        </button>
-                        <button onclick="SessionManager.clearAll()" class="btn btn-danger">
-                            <i class="fas fa-trash-alt"></i> ล้างทั้งหมด
-                        </button>
-                    </div>
-                </div>
-            </article>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-download"></i>
+            </div>
+            <div class="stat-content">
+                <h3>ดาวน์โหลด</h3>
+                <div class="stat-number">{{ stats.total_downloads }}</div>
+                <div class="stat-sub">ครั้ง</div>
+            </div>
         </div>
-    </section>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h3>เซสชัน</h3>
+                <div class="stat-number">{{ stats.total_sessions }}</div>
+                <div class="stat-sub">คน</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-redo"></i>
+            </div>
+            <div class="stat-content">
+                <h3>ถ่ายใหม่</h3>
+                <div class="stat-number">{{ stats.retake_used if stats.retake_used else 0 }}</div>
+                <div class="stat-sub">ครั้ง</div>
+            </div>
+        </div>
+    </div>
 
     <!-- Camera Control Section -->
-    <section class="control-section">
-        <h2 class="section-title">
-            <i class="fas fa-gamepad"></i> การควบคุมระบบ
-        </h2>
+    <div class="control-section">
+        <div class="section-header">
+            <h2><i class="fas fa-gamepad"></i> การควบคุมระบบ</h2>
+        </div>
         
         <div class="control-grid">
             <!-- Camera Lock Control -->
@@ -253,15 +103,15 @@
                 <h3><i class="fas fa-lock"></i> การล็อคเครื่องถ่ายรูป</h3>
                 <div class="control-status">
                     {% if camera_locked %}
-                    <div class="status-badge status-locked">
+                    <div class="status-badge locked">
                         <i class="fas fa-lock"></i> ถูกล็อค
                     </div>
                     <div class="status-info">
-                        <p><strong>รหัสที่ล็อค:</strong> {{ locked_by_code|default('-') }}</p>
+                        <p><strong>รหัสที่ล็อค:</strong> {{ locked_by_code }}</p>
                         <p><strong>สถานะ:</strong> รอการสแกนรับรูป</p>
                     </div>
                     <div class="control-buttons">
-                        <button onclick="unlockCamera()" class="btn btn-success">
+                        <button onclick="unlockCamera()" class="btn btn-unlock">
                             <i class="fas fa-unlock"></i> ปลดล็อคเครื่อง
                         </button>
                         <button onclick="forceUnlock()" class="btn btn-warning">
@@ -269,7 +119,7 @@
                         </button>
                     </div>
                     {% else %}
-                    <div class="status-badge status-unlocked">
+                    <div class="status-badge unlocked">
                         <i class="fas fa-unlock"></i> ไม่ถูกล็อค
                     </div>
                     <div class="status-info">
@@ -277,7 +127,7 @@
                         <p><strong>ผู้ใช้:</strong> สามารถถ่ายรูปได้</p>
                     </div>
                     <div class="control-buttons">
-                        <button onclick="lockCameraTest()" class="btn btn-info">
+                        <button onclick="lockCameraTest()" class="btn btn-test">
                             <i class="fas fa-vial"></i> ทดสอบล็อค
                         </button>
                     </div>
@@ -311,7 +161,7 @@
                         <p>ยังไม่มี QR ในระบบ</p>
                     </div>
                     <div class="control-buttons">
-                        <button onclick="createTestQR()" class="btn btn-info">
+                        <button onclick="createTestQR()" class="btn btn-test">
                             <i class="fas fa-plus"></i> สร้างทดสอบ
                         </button>
                     </div>
@@ -326,38 +176,37 @@
                     <div class="setting-item">
                         <label><i class="fas fa-camera"></i> จำกัดการถ่ายใหม่:</label>
                         <select id="retakeLimit" class="setting-select">
-                            <option value="1" {% if settings.retake_limit == 1 %}selected{% endif %}>1 ครั้ง</option>
-                            <option value="0" {% if settings.retake_limit == 0 %}selected{% endif %}>ไม่ให้ถ่ายใหม่</option>
-                            <option value="2" {% if settings.retake_limit == 2 %}selected{% endif %}>2 ครั้ง</option>
+                            <option value="1" selected>1 ครั้ง</option>
+                            <option value="0">ไม่ให้ถ่ายใหม่</option>
+                            <option value="2">2 ครั้ง</option>
                         </select>
                     </div>
                     <div class="setting-item">
                         <label><i class="fas fa-image"></i> จำนวนรูปสูงสุด:</label>
                         <select id="maxPhotos" class="setting-select">
-                            <option value="1" {% if settings.max_photos == 1 %}selected{% endif %}>1 รูป</option>
-                            <option value="2" {% if settings.max_photos == 2 %}selected{% endif %}>2 รูป</option>
-                            <option value="3" {% if settings.max_photos == 3 %}selected{% endif %}>3 รูป</option>
-                            <option value="4" {% if settings.max_photos == 4 %}selected{% endif %}>4 รูป</option>
+                            <option value="1">1 รูป</option>
+                            <option value="2">2 รูป</option>
+                            <option value="3" selected>3 รูป</option>
+                            <option value="4">4 รูป</option>
                         </select>
                     </div>
                     <div class="control-buttons">
                         <button onclick="saveSettings()" class="btn btn-primary">
                             <i class="fas fa-save"></i> บันทึกการตั้งค่า
                         </button>
-                        <button onclick="resetSettings()" class="btn btn-secondary">
+                        <button onclick="resetSettings()" class="btn">
                             <i class="fas fa-undo"></i> รีเซ็ต
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Photos List Section -->
-    <section class="photos-section">
+    <!-- Photos List -->
+    <div class="photos-section">
         <div class="section-header">
-            <h2><i class="fas fa-images"></i> รูปทั้งหมด</h2>
-            <span class="section-badge">{{ photos|length if photos else 0 }} เซสชัน</span>
+            <h2><i class="fas fa-images"></i> รูปทั้งหมด ({{ photos|length if photos else 0 }} เซสชัน)</h2>
             <div class="section-actions">
                 <button onclick="exportAllData()" class="btn btn-export">
                     <i class="fas fa-file-export"></i> Export ข้อมูล
@@ -369,7 +218,7 @@
         </div>
         
         {% if photos and photos|length > 0 %}
-        <div class="table-responsive">
+        <div class="table-container">
             <table class="photos-table">
                 <thead>
                     <tr>
@@ -410,23 +259,23 @@
                         </td>
                         <td>
                             <div class="time-cell">
-                                <div class="time-main">{{ photo.time_display if photo.time_display else '-' }}</div>
+                                <div class="time-main">{{ photo.time_display if photo.time_display else 'N/A' }}</div>
                                 <div class="time-sub">{{ photo.timestamp[:10] if photo.timestamp else '' }}</div>
                             </div>
                         </td>
                         <td>
-                            <span class="badge badge-info">{{ photo.filenames|length if photo.filenames else 0 }}</span>
+                            <span class="badge count-badge">{{ photo.filenames|length if photo.filenames else 0 }}</span>
                         </td>
                         <td>
-                            <span class="badge badge-success">{{ photo.download_count if photo.download_count else 0 }}</span>
+                            <span class="badge download-badge">{{ photo.download_count if photo.download_count else 0 }}</span>
                         </td>
                         <td>
                             {% if photo.retake_used %}
-                            <span class="badge badge-warning">
+                            <span class="badge retake-badge used">
                                 <i class="fas fa-check"></i> ใช้แล้ว
                             </span>
                             {% else %}
-                            <span class="badge badge-secondary">
+                            <span class="badge retake-badge available">
                                 <i class="fas fa-times"></i> ยังไม่ใช้
                             </span>
                             {% endif %}
@@ -434,21 +283,21 @@
                         <td>
                             <div class="action-buttons">
                                 <button onclick="deletePhoto('{{ photo.pickup_code }}')" 
-                                        class="btn-icon btn-delete" title="ลบรูป">
+                                        class="btn-action btn-delete" title="ลบรูป">
                                     <i class="fas fa-trash"></i>
                                 </button>
                                 <a href="/download/{{ photo.pickup_code }}" 
                                    target="_blank" 
-                                   class="btn-icon btn-view" title="ดูรูป">
+                                   class="btn-action btn-view" title="ดูรูป">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <a href="/scan/{{ photo.pickup_code }}" 
                                    target="_blank" 
-                                   class="btn-icon btn-scan" title="สแกน QR">
+                                   class="btn-action btn-scan" title="สแกน QR">
                                     <i class="fas fa-qrcode"></i>
                                 </a>
                                 <button onclick="downloadPhotoZip('{{ photo.pickup_code }}')" 
-                                        class="btn-icon btn-download" title="ดาวน์โหลด ZIP">
+                                        class="btn-action btn-download" title="ดาวน์โหลด ZIP">
                                     <i class="fas fa-download"></i>
                                 </button>
                             </div>
@@ -478,19 +327,19 @@
                 <i class="fas fa-images fa-3x"></i>
             </div>
             <h3>ยังไม่มีรูปในระบบ</h3>
-            <p>ไปที่หน้า <a href="/capture" class="link">Camera</a> เพื่อถ่ายรูปแรก</p>
-            <button onclick="createSampleData()" class="btn btn-info">
+            <p>ไปที่หน้า <a href="/capture">Camera</a> เพื่อถ่ายรูปแรก</p>
+            <button onclick="createSampleData()" class="btn btn-test">
                 <i class="fas fa-magic"></i> สร้างข้อมูลตัวอย่าง
             </button>
         </div>
         {% endif %}
-    </section>
+    </div>
 
     <!-- System Information -->
-    <section class="system-info-section">
-        <h2 class="section-title">
-            <i class="fas fa-info-circle"></i> ข้อมูลระบบ
-        </h2>
+    <div class="system-info-section">
+        <div class="section-header">
+            <h2><i class="fas fa-info-circle"></i> ข้อมูลระบบ</h2>
+        </div>
         
         <div class="info-grid">
             <div class="info-card">
@@ -520,15 +369,15 @@
                 <div class="system-stats">
                     <div class="system-stat">
                         <span>อัพโหลดล่าสุด:</span>
-                        <span id="lastUploadTime">-</span>
+                        <span id="lastUploadTime">กำลังโหลด...</span>
                     </div>
                     <div class="system-stat">
                         <span>QR ล่าสุด:</span>
-                        <span id="lastQRTime">{{ latest_qr.time_display if latest_qr else '-' }}</span>
+                        <span id="lastQRTime">{{ latest_qr.time_display if latest_qr else 'N/A' }}</span>
                     </div>
                     <div class="system-stat">
                         <span>สถานะกล้อง:</span>
-                        <span id="cameraStatusLive" class="status-indicator {% if camera_locked %}status-locked{% else %}status-unlocked{% endif %}">
+                        <span id="cameraStatusLive" class="status-indicator {% if camera_locked %}locked{% else %}unlocked{% endif %}">
                             {% if camera_locked %}
                             <i class="fas fa-lock"></i> ล็อค
                             {% else %}
@@ -567,10 +416,10 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Quick Actions -->
-    <section class="quick-actions">
+    <div class="quick-actions">
         <h3><i class="fas fa-bolt"></i> การดำเนินการด่วน</h3>
         <div class="action-buttons-grid">
             <button onclick="quickUnlock()" class="btn-quick-action">
@@ -598,22 +447,517 @@
                 <span>ทดสอบระบบ</span>
             </button>
         </div>
-    </section>
+    </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal สำหรับข้อมูลเพิ่มเติม -->
 <div id="infoModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 id="modalTitle"></h3>
+            <h3 id="modalTitle">Modal Title</h3>
             <span class="close" onclick="closeModal()">&times;</span>
         </div>
-        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-body" id="modalBody">
+            <!-- เนื้อหาจะถูกใส่โดย JavaScript -->
+        </div>
         <div class="modal-footer">
-            <button onclick="closeModal()" class="btn btn-secondary">ปิด</button>
+            <button onclick="closeModal()" class="btn">ปิด</button>
         </div>
     </div>
 </div>
+
+<script>
+// ============================================
+// Utility Functions
+// ============================================
+function showMessage(text, type = 'info') {
+    const message = document.createElement('div');
+    message.className = `message message-${type}`;
+    message.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        ${text}
+    `;
+    
+    document.body.appendChild(message);
+    
+    setTimeout(() => {
+        message.style.opacity = '0';
+        setTimeout(() => message.remove(), 500);
+    }, 3000);
+}
+
+function showModal(title, content) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').innerHTML = content;
+    document.getElementById('infoModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('infoModal').style.display = 'none';
+}
+
+function copyCode(code) {
+    navigator.clipboard.writeText(code).then(() => {
+        showMessage(`คัดลอกรหัส ${code} เรียบร้อย`, 'success');
+    });
+}
+
+// ============================================
+// Time Functions
+// ============================================
+function updateTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('th-TH');
+    const dateStr = now.toLocaleDateString('th-TH', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    document.getElementById('currentTime').textContent = timeStr;
+    document.getElementById('serverTime').textContent = `${dateStr} ${timeStr}`;
+}
+
+// ============================================
+// Camera Control Functions
+// ============================================
+function unlockCamera() {
+    if (confirm('ยืนยันการปลดล็อคเครื่องถ่ายรูป?\nเครื่องจะสามารถถ่ายรูปได้ทันที')) {
+        fetch('/api/unlock_camera', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('ปลดล็อคเครื่องถ่ายรูปเรียบร้อยแล้ว', 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showMessage('ไม่สามารถปลดล็อคได้: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+                console.error(error);
+            });
+    }
+}
+
+function forceUnlock() {
+    if (confirm('⚠️ ต้องการปลดล็อคทันทีโดยไม่ต้องสแกน QR?\nการกระทำนี้อาจทำให้ผู้ใช้ไม่สามารถรับรูปได้')) {
+        fetch('/api/unlock_camera', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('ปลดล็อคฉุกเฉินสำเร็จ', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                }
+            });
+    }
+}
+
+function lockCameraTest() {
+    showModal('ทดสอบล็อคเครื่อง', `
+        <p>ฟังก์ชันนี้ใช้สำหรับทดสอบระบบล็อคเครื่อง</p>
+        <p>ระบบจะสร้างรูปทดสอบและล็อคเครื่องชั่วคราว</p>
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="createTestLock()" class="btn btn-test" style="font-size: 1.2rem;">
+                <i class="fas fa-vial"></i> ดำเนินการทดสอบ
+            </button>
+        </div>
+    `);
+}
+
+function createTestLock() {
+    fetch('/api/test_lock', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('สร้างการทดสอบล็อคสำเร็จ', 'success');
+                closeModal();
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showMessage('ไม่สามารถสร้างทดสอบได้: ' + data.error, 'error');
+            }
+        })
+        .catch(() => {
+            showMessage('API นี้ต้องตั้งค่าเพิ่มเติม', 'info');
+        });
+}
+
+// ============================================
+// QR Control Functions
+// ============================================
+function clearQR() {
+    if (confirm('ยืนยันการล้าง QR ล่าสุด?\nQR บนจอแสดงจะหายไป')) {
+        fetch('/api/clear_qr', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('ล้าง QR ล่าสุดเรียบร้อยแล้ว', 'success');
+                    setTimeout(() => location.reload(), 1500);
+                }
+            })
+            .catch(error => {
+                showMessage('เกิดข้อผิดพลาด', 'error');
+                console.error(error);
+            });
+    }
+}
+
+function viewQR(code) {
+    window.open(`/scan/${code}`, '_blank');
+}
+
+function createTestQR() {
+    fetch('/api/create_test_qr', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('สร้าง QR ทดสอบสำเร็จ', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showMessage('ไม่สามารถสร้าง QR ทดสอบได้', 'error');
+            }
+        })
+        .catch(() => {
+            showMessage('API นี้ต้องตั้งค่าเพิ่มเติม', 'info');
+        });
+}
+
+// ============================================
+// Photo Management Functions
+// ============================================
+function deletePhoto(code) {
+    if (confirm(`ยืนยันการลบรูปรหัส ${code}?\nการกระทำนี้ไม่สามารถย้อนกลับได้`)) {
+        fetch(`/api/delete/${code}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage(`ลบรูป ${code} เรียบร้อย`, 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showMessage('ลบไม่สำเร็จ: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+                console.error(error);
+            });
+    }
+}
+
+function downloadPhotoZip(code) {
+    window.open(`/api/download_all/${code}`, '_blank');
+}
+
+function clearAllPhotos() {
+    if (confirm('⚠️ ต้องการลบรูปทั้งหมดใช่หรือไม่?\nการกระทำนี้จะลบทุกรูปและสถิติ!\nไม่สามารถย้อนกลับได้!')) {
+        if (prompt('พิมพ์ "DELETE ALL PHOTOS" เพื่อยืนยัน:') === 'DELETE ALL PHOTOS') {
+            fetch('/api/clear_all_photos', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage('ลบรูปทั้งหมดเรียบร้อยแล้ว', 'success');
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                })
+                .catch(() => {
+                    showMessage('ฟังก์ชันนี้ต้องตั้งค่าเพิ่มเติม', 'info');
+                });
+        }
+    }
+}
+
+function backupPhotos() {
+    showModal('Backup ข้อมูล', `
+        <p>ระบบจะสร้างไฟล์ Backup ข้อมูลทั้งหมด</p>
+        <div class="backup-options">
+            <button onclick="exportJSON()" class="btn btn-secondary">
+                <i class="fas fa-file-code"></i> Export JSON
+            </button>
+            <button onclick="exportCSV()" class="btn btn-secondary">
+                <i class="fas fa-file-csv"></i> Export CSV
+            </button>
+            <button onclick="downloadPhotosZip()" class="btn btn-primary">
+                <i class="fas fa-file-archive"></i> ดาวน์โหลดรูปทั้งหมด (ZIP)
+            </button>
+        </div>
+    `);
+}
+
+function exportJSON() {
+    window.open('/api/admin_data', '_blank');
+    closeModal();
+}
+
+function exportCSV() {
+    fetch('/api/export_csv')
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'photobooth_data.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(() => {
+            showMessage('API นี้ต้องตั้งค่าเพิ่มเติม', 'info');
+        });
+}
+
+// ============================================
+// System Functions
+// ============================================
+function saveSettings() {
+    const retakeLimit = document.getElementById('retakeLimit').value;
+    const maxPhotos = document.getElementById('maxPhotos').value;
+    
+    fetch('/api/save_settings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            retake_limit: retakeLimit,
+            max_photos: maxPhotos
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage('บันทึกการตั้งค่าเรียบร้อยแล้ว', 'success');
+        } else {
+            showMessage('บันทึกไม่สำเร็จ: ' + data.error, 'error');
+        }
+    })
+    .catch(() => {
+        showMessage('API นี้ต้องตั้งค่าเพิ่มเติม', 'info');
+    });
+}
+
+function resetSettings() {
+    document.getElementById('retakeLimit').value = '1';
+    document.getElementById('maxPhotos').value = '3';
+    showMessage('รีเซ็ตการตั้งค่าแล้ว', 'info');
+}
+
+function restartCamera() {
+    if (confirm('ยืนยันการรีสตาร์ทระบบกล้อง?\nอาจทำให้ผู้ใช้ถ่ายรูปไม่สำเร็จชั่วคราว')) {
+        fetch('/api/restart_camera', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('รีสตาร์ทระบบกล้องสำเร็จ', 'success');
+                } else {
+                    showMessage('รีสตาร์ทไม่สำเร็จ', 'error');
+                }
+            })
+            .catch(() => {
+                showMessage('API นี้ต้องตั้งค่าเพิ่มเติม', 'info');
+            });
+    }
+}
+
+function checkDiskSpace() {
+    fetch('/api/system_info')
+        .then(response => response.json())
+        .then(data => {
+            if (data.disk_percent) {
+                showModal('พื้นที่ดิสก์', `
+                    <div class="disk-info">
+                        <div class="disk-usage">
+                            <div class="usage-bar">
+                                <div class="usage-fill" style="width: ${data.disk_percent}%"></div>
+                            </div>
+                            <div class="usage-text">${data.disk_percent}%</div>
+                        </div>
+                        <div class="disk-stats">
+                            <p><strong>ใช้ไป:</strong> ${data.disk_used_gb} GB</p>
+                            <p><strong>คงเหลือ:</strong> ${data.disk_free_gb} GB</p>
+                            <p><strong>ทั้งหมด:</strong> ${data.disk_total_gb} GB</p>
+                        </div>
+                    </div>
+                `);
+            } else {
+                showMessage('ไม่สามารถดึงข้อมูลพื้นที่ดิสก์ได้', 'error');
+            }
+        })
+        .catch(() => {
+            showMessage('ไม่สามารถตรวจสอบพื้นที่ดิสก์ได้', 'error');
+        });
+}
+
+function systemDiagnostic() {
+    fetch('/api/status')
+        .then(response => response.json())
+        .then(data => {
+            showModal('วินิจฉัยระบบ', `
+                <div class="diagnostic-info">
+                    <p><strong>สถานะเซิร์ฟเวอร์:</strong> <span class="status-online">${data.status}</span></p>
+                    <p><strong>รูปทั้งหมด:</strong> ${data.total_photos}</p>
+                    <p><strong>เซสชันทั้งหมด:</strong> ${data.total_sessions}</p>
+                    <p><strong>ดาวน์โหลดทั้งหมด:</strong> ${data.total_downloads}</p>
+                    <p><strong>สถานะกล้อง:</strong> ${data.camera_locked ? 'ล็อค' : 'ปลดล็อค'}</p>
+                    <p><strong>สามารถถ่ายใหม่ได้:</strong> ${data.retake_available ? 'ใช่' : 'ไม่'}</p>
+                    <p><strong>เวลาเซิร์ฟเวอร์:</strong> ${new Date(data.timestamp).toLocaleString('th-TH')}</p>
+                </div>
+            `);
+        });
+}
+
+function emergencyUnlock() {
+    if (confirm('⚠️ EMERGENCY UNLOCK ⚠️\nต้องการปลดล็อคระบบฉุกเฉินทั้งหมดใช่หรือไม่?\nการกระทำนี้จะ:\n1. ปลดล็อคเครื่องถ่ายรูป\n2. ล้าง QR ล่าสุด\n3. รีเซ็ตระบบ')) {
+        fetch('/api/emergency_unlock', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('ปลดล็อคฉุกเฉินสำเร็จ', 'success');
+                    setTimeout(() => location.reload(), 2000);
+                }
+            })
+            .catch(() => {
+                showMessage('API นี้ต้องตั้งค่าเพิ่มเติม', 'info');
+            });
+    }
+}
+
+// ============================================
+// Quick Actions Functions
+// ============================================
+function quickUnlock() {
+    unlockCamera();
+}
+
+function quickClearQR() {
+    clearQR();
+}
+
+function quickRefresh() {
+    location.reload();
+}
+
+function quickStats() {
+    fetch('/api/admin_data')
+        .then(response => response.json())
+        .then(data => {
+            showMessage('อัปเดตสถิติสำเร็จ', 'success');
+            // สามารถอัปเดต UI ได้ที่นี่ถ้าต้องการ
+        });
+}
+
+function quickBackup() {
+    backupPhotos();
+}
+
+function quickTest() {
+    fetch('/api/test_camera')
+        .then(response => response.json())
+        .then(data => {
+            showModal('ผลการทดสอบ', `
+                <p><strong>สถานะกล้อง:</strong> ${data.camera_support}</p>
+                <p><strong>เบราว์เซอร์ที่แนะนำ:</strong> ${data.browser_check}</p>
+                <p><strong>หมายเหตุ:</strong> ${data.note}</p>
+                <a href="${data.test_url}" target="_blank" class="btn btn-test">
+                    <i class="fas fa-external-link-alt"></i> ไปหน้าทดสอบ WebRTC
+                </a>
+            `);
+        });
+}
+
+// ============================================
+// Other Functions
+// ============================================
+function exportAllData() {
+    window.open('/api/admin_data', '_blank');
+}
+
+function refreshData() {
+    location.reload();
+}
+
+function createSampleData() {
+    if (confirm('สร้างข้อมูลตัวอย่าง?\nจะมีการเพิ่มรูปและสถิติเทียม')) {
+        fetch('/api/create_sample_data', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('สร้างข้อมูลตัวอย่างสำเร็จ', 'success');
+                    setTimeout(() => location.reload(), 2000);
+                }
+            })
+            .catch(() => {
+                showMessage('API นี้ต้องตั้งค่าเพิ่มเติม', 'info');
+            });
+    }
+}
+
+function clearCache() {
+    if (confirm('ล้างแคชเบราว์เซอร์?\nอาจต้องล็อกอินใหม่ในบางหน้า')) {
+        if (caches && caches.keys) {
+            caches.keys().then(function(names) {
+                for (let name of names) caches.delete(name);
+                showMessage('ล้างแคชสำเร็จ', 'success');
+            });
+        } else {
+            showMessage('เบราว์เซอร์ไม่รองรับการล้างแคช', 'info');
+        }
+    }
+}
+
+function viewLogs() {
+    fetch('/api/get_logs')
+        .then(response => response.json())
+        .then(data => {
+            if (data.logs) {
+                showModal('System Logs', `
+                    <div class="logs-container">
+                        <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; max-height: 400px; overflow-y: auto;">${data.logs}</pre>
+                    </div>
+                `);
+            } else {
+                showMessage('ไม่พบไฟล์ Logs', 'info');
+            }
+        })
+        .catch(() => {
+            showMessage('API นี้ต้องตั้งค่าเพิ่มเติม', 'info');
+        });
+}
+
+// ============================================
+// Initialize
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    // อัปเดตเวลาปัจจุบัน
+    updateTime();
+    setInterval(updateTime, 1000);
+    
+    // ตั้งค่าการตรวจสอบสถานะอัตโนมัติ
+    setInterval(() => {
+        fetch('/api/camera_status')
+            .then(response => response.json())
+            .then(data => {
+                const statusEl = document.getElementById('cameraStatusLive');
+                if (data.camera_locked) {
+                    statusEl.className = 'status-indicator locked';
+                    statusEl.innerHTML = '<i class="fas fa-lock"></i> ล็อค';
+                } else {
+                    statusEl.className = 'status-indicator unlocked';
+                    statusEl.innerHTML = '<i class="fas fa-unlock"></i> ปลดล็อค';
+                }
+            });
+    }, 10000);
+    
+    // ปิด modal เมื่อกดนอก
+    window.onclick = function(event) {
+        const modal = document.getElementById('infoModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+});
+</script>
 
 <style>
 /* ============================================
@@ -627,20 +971,6 @@
     min-height: 100vh;
 }
 
-.section-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #2d3748;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.section-title i {
-    color: #667eea;
-}
-
 /* ============================================
    Header
 ============================================ */
@@ -650,19 +980,20 @@
     padding: 30px;
     border-radius: 15px;
     margin-bottom: 30px;
+    text-align: center;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
 .admin-header h1 {
-    font-size: 2.5rem;
-    margin: 0 0 10px 0;
+    font-size: 2.8rem;
+    margin-bottom: 10px;
     color: white;
 }
 
-.admin-header .subtitle {
-    font-size: 1.1rem;
+.admin-header p {
+    font-size: 1.2rem;
     opacity: 0.9;
-    margin: 0;
+    margin-bottom: 20px;
 }
 
 .server-info {
@@ -675,79 +1006,106 @@
     border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-.info-item {
+.server-info span {
     background: rgba(255,255,255,0.1);
     padding: 8px 15px;
     border-radius: 20px;
+    font-family: monospace;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
     gap: 8px;
-    font-family: monospace;
-    font-size: 0.9rem;
 }
 
 /* ============================================
-   Status Grid
+   System Status
 ============================================ */
-.status-grid,
-.stats-grid,
-.device-grid,
-.control-grid,
-.info-grid {
+.system-status {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.section-header h2 {
+    color: #2d3748;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
 }
 
 .status-card {
     background: white;
-    padding: 2rem;
+    padding: 25px;
     border-radius: 12px;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border-left: 5px solid #667eea;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .status-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
-.status-card.status-online { border-left: 4px solid #48bb78; }
-.status-card.status-locked { border-left: 4px solid #f56565; }
-.status-card.status-unlocked { border-left: 4px solid #48bb78; }
-.status-card.status-active { border-left: 4px solid #ed8936; }
-.status-card.status-normal { border-left: 4px solid #667eea; }
+.status-card.online { border-left-color: #48bb78; }
+.status-card.locked { border-left-color: #f56565; }
+.status-card.unlocked { border-left-color: #48bb78; }
+.status-card.active { border-left-color: #ed8936; }
+.status-card.normal { border-left-color: #667eea; }
 
-.status-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+.status-card i {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
     color: #667eea;
 }
 
-.status-card.status-online .status-icon { color: #48bb78; }
-.status-card.status-locked .status-icon { color: #f56565; }
-.status-card.status-unlocked .status-icon { color: #48bb78; }
-.status-card.status-active .status-icon { color: #ed8936; }
+.status-card.online i { color: #48bb78; }
+.status-card.locked i { color: #f56565; }
+.status-card.unlocked i { color: #48bb78; }
+.status-card.active i { color: #ed8936; }
 
-.status-badge {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 600;
-    margin-top: 0.5rem;
+.status-card h3 {
+    color: #4a5568;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
 }
 
-.status-online .status-badge { background: #c6f6d5; color: #22543d; }
-.status-locked .status-badge { background: #fed7d7; color: #742a2a; }
-.status-unlocked .status-badge { background: #c6f6d5; color: #22543d; }
-.status-active .status-badge { background: #feebc8; color: #744210; }
-.status-normal .status-badge { background: #e9d8fd; color: #44337a; }
+.status-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2d3748;
+    letter-spacing: 1px;
+}
 
 /* ============================================
-   Stat Cards
+   Statistics Grid
 ============================================ */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
 .stat-card {
     background: white;
     padding: 25px;
@@ -756,6 +1114,11 @@
     align-items: center;
     gap: 20px;
     box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
 }
 
 .stat-icon {
@@ -772,15 +1135,15 @@
 
 .stat-content h3 {
     color: #718096;
-    font-size: 0.9rem;
-    margin: 0 0 5px 0;
+    font-size: 1rem;
+    margin-bottom: 5px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .stat-number {
-    font-size: 2.2rem;
-    font-weight: 700;
+    font-size: 2.5rem;
+    font-weight: bold;
     color: #2d3748;
     line-height: 1;
     margin-bottom: 5px;
@@ -788,114 +1151,28 @@
 
 .stat-sub {
     color: #a0aec0;
-    font-size: 0.85rem;
-}
-
-/* ============================================
-   Device Cards
-============================================ */
-.device-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    overflow: hidden;
-}
-
-.card-header {
-    background: linear-gradient(135deg, #f7fafc, #edf2f7);
-    padding: 1.5rem;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.card-header h3 {
-    margin: 0;
-    font-size: 1.2rem;
-    color: #2d3748;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.card-body {
-    padding: 1.5rem;
-}
-
-.usage-display {
-    margin-bottom: 1.5rem;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 30px;
-    background: #e2e8f0;
-    border-radius: 15px;
-    overflow: hidden;
-    margin-bottom: 0.75rem;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(135deg, #48bb78, #38a169);
-    border-radius: 15px;
-    transition: width 0.5s ease;
-}
-
-.progress-fill[data-type="qr"] {
-    background: linear-gradient(135deg, #4299e1, #3182ce);
-}
-
-.usage-text {
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-.current-count {
-    color: #667eea;
-    font-size: 1.8rem;
-}
-
-.max-count {
-    color: #a0aec0;
-    font-size: 1.2rem;
-}
-
-.unit {
-    color: #a0aec0;
     font-size: 0.9rem;
-    margin-left: 0.25rem;
-}
-
-.device-settings {
-    margin-bottom: 1.5rem;
-}
-
-.device-settings label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #4a5568;
-    font-weight: 600;
-}
-
-.setting-select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    transition: border-color 0.3s;
-}
-
-.setting-select:focus {
-    outline: none;
-    border-color: #667eea;
 }
 
 /* ============================================
-   Control Cards
+   Control Section
 ============================================ */
-.control-card {
+.control-section {
     background: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+}
+
+.control-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.control-card {
+    background: #f8f9fa;
     padding: 25px;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
@@ -903,8 +1180,8 @@
 
 .control-card h3 {
     color: #2d3748;
-    margin: 0 0 20px 0;
-    font-size: 1.2rem;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -914,8 +1191,23 @@
     text-align: center;
 }
 
-.control-status .status-badge {
+.status-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: bold;
     margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+.status-badge.locked {
+    background: #fed7d7;
+    color: #742a2a;
+}
+
+.status-badge.unlocked {
+    background: #c6f6d5;
+    color: #22543d;
 }
 
 .status-info {
@@ -945,7 +1237,7 @@
     align-items: center;
     margin-bottom: 15px;
     padding: 10px;
-    background: #f8f9fa;
+    background: white;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
 }
@@ -953,11 +1245,20 @@
 .setting-item label {
     color: #4a5568;
     font-weight: 500;
-    font-size: 0.95rem;
+}
+
+.setting-select {
+    padding: 8px 15px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e0;
+    background: white;
+    color: #2d3748;
+    font-size: 0.9rem;
+    min-width: 100px;
 }
 
 /* ============================================
-   Tables
+   Photos Section
 ============================================ */
 .photos-section {
     background: white;
@@ -967,41 +1268,12 @@
     box-shadow: 0 3px 15px rgba(0,0,0,0.08);
 }
 
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e2e8f0;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-.section-header h2 {
-    color: #2d3748;
-    font-size: 1.5rem;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.section-badge {
-    background: #e2e8f0;
-    padding: 5px 15px;
-    border-radius: 20px;
-    color: #4a5568;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
 .section-actions {
     display: flex;
     gap: 10px;
 }
 
-.table-responsive {
+.table-container {
     overflow-x: auto;
     margin: 20px 0;
     border-radius: 10px;
@@ -1037,7 +1309,7 @@
 .code-cell {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .code-cell code {
@@ -1045,7 +1317,7 @@
     padding: 5px 10px;
     border-radius: 5px;
     font-family: monospace;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: #2d3748;
 }
 
@@ -1097,7 +1369,7 @@
     align-items: center;
     justify-content: center;
     color: #a0aec0;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
 }
 
 .time-cell {
@@ -1117,42 +1389,47 @@
 .badge {
     display: inline-block;
     padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
     font-weight: 500;
 }
 
-.badge-info {
+.count-badge {
     background: #bee3f8;
     color: #2c5282;
 }
 
-.badge-success {
+.download-badge {
     background: #c6f6d5;
     color: #22543d;
 }
 
-.badge-warning {
+.retake-badge {
     background: #feebc8;
     color: #744210;
 }
 
-.badge-secondary {
-    background: #e2e8f0;
-    color: #4a5568;
+.retake-badge.used {
+    background: #fed7d7;
+    color: #742a2a;
 }
 
-.btn-icon {
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
     width: 36px;
     height: 36px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
-    font-size: 0.9rem;
 }
 
 .btn-delete {
@@ -1175,7 +1452,7 @@
     color: #553c9a;
 }
 
-.btn-icon:hover {
+.btn-action:hover {
     transform: translateY(-2px);
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
@@ -1187,8 +1464,6 @@
     margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid #e2e8f0;
-    flex-wrap: wrap;
-    gap: 15px;
 }
 
 .pagination-info {
@@ -1196,14 +1471,6 @@
     font-size: 0.9rem;
 }
 
-.table-actions {
-    display: flex;
-    gap: 10px;
-}
-
-/* ============================================
-   Empty State
-============================================ */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -1218,25 +1485,14 @@
 .empty-state h3 {
     margin-bottom: 10px;
     color: #4a5568;
-    font-size: 1.3rem;
 }
 
 .empty-state p {
     margin-bottom: 25px;
 }
 
-.link {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.link:hover {
-    text-decoration: underline;
-}
-
 /* ============================================
-   System Info
+   System Information
 ============================================ */
 .system-info-section {
     background: white;
@@ -1244,6 +1500,12 @@
     border-radius: 15px;
     margin-bottom: 30px;
     box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
 }
 
 .info-card {
@@ -1255,8 +1517,8 @@
 
 .info-card h3 {
     color: #2d3748;
-    margin: 0 0 20px 0;
-    font-size: 1.2rem;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1293,6 +1555,10 @@
     opacity: 0.7;
 }
 
+.info-link:hover span {
+    opacity: 1;
+}
+
 .system-stats {
     display: flex;
     flex-direction: column;
@@ -1303,7 +1569,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
+    padding: 10px;
     background: white;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
@@ -1323,18 +1589,18 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 4px 12px;
-    border-radius: 20px;
+    padding: 4px 10px;
+    border-radius: 12px;
     font-size: 0.85rem;
     font-weight: 500;
 }
 
-.status-indicator.status-locked {
+.status-indicator.locked {
     background: #fed7d7;
     color: #742a2a;
 }
 
-.status-indicator.status-unlocked {
+.status-indicator.unlocked {
     background: #c6f6d5;
     color: #22543d;
 }
@@ -1368,7 +1634,7 @@
 }
 
 .btn-emergency {
-    grid-column: span 2;
+    grid-column: 1 / -1;
     background: #fed7d7;
     color: #742a2a;
     border-color: #fc8181;
@@ -1392,8 +1658,8 @@
 
 .quick-actions h3 {
     color: #2d3748;
-    margin: 0 0 20px 0;
-    font-size: 1.3rem;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1424,11 +1690,11 @@
     background: #667eea;
     color: white;
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
 .btn-quick-action i {
-    font-size: 1.8rem;
+    font-size: 2rem;
     margin-bottom: 10px;
 }
 
@@ -1436,73 +1702,6 @@
     font-size: 0.9rem;
     font-weight: 500;
     text-align: center;
-}
-
-/* ============================================
-   Buttons
-============================================ */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: all 0.3s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.btn-success {
-    background: #48bb78;
-    color: white;
-}
-
-.btn-danger {
-    background: #f56565;
-    color: white;
-}
-
-.btn-warning {
-    background: #ed8936;
-    color: white;
-}
-
-.btn-info {
-    background: #4299e1;
-    color: white;
-}
-
-.btn-secondary {
-    background: #a0aec0;
-    color: white;
-}
-
-.btn-export {
-    background: #9f7aea;
-    color: white;
-}
-
-.btn-refresh {
-    background: #4299e1;
-    color: white;
-}
-
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
 /* ============================================
@@ -1554,7 +1753,7 @@
 
 .modal-header h3 {
     margin: 0;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
 }
 
 .close {
@@ -1581,6 +1780,78 @@
     border-radius: 0 0 15px 15px;
     text-align: right;
     border-top: 1px solid #e2e8f0;
+}
+
+/* ============================================
+   Buttons
+============================================ */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-secondary {
+    background: #48bb78;
+    color: white;
+}
+
+.btn-danger {
+    background: #f56565;
+    color: white;
+}
+
+.btn-warning {
+    background: #ed8936;
+    color: white;
+}
+
+.btn-unlock {
+    background: #48bb78;
+    color: white;
+}
+
+.btn-test {
+    background: #667eea;
+    color: white;
+}
+
+.btn-export {
+    background: #9f7aea;
+    color: white;
+}
+
+.btn-refresh {
+    background: #4299e1;
+    color: white;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* ============================================
@@ -1627,22 +1898,8 @@
 }
 
 /* ============================================
-   Responsive
+   Responsive Design
 ============================================ */
-@media (max-width: 1024px) {
-    .admin-header h1 {
-        font-size: 2rem;
-    }
-    
-    .status-grid,
-    .stats-grid,
-    .device-grid,
-    .control-grid,
-    .info-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
 @media (max-width: 768px) {
     .admin-page {
         padding: 10px;
@@ -1653,12 +1910,15 @@
     }
     
     .admin-header h1 {
-        font-size: 1.6rem;
+        font-size: 2rem;
     }
     
-    .status-grid,
+    .server-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
     .stats-grid,
-    .device-grid,
     .control-grid,
     .info-grid {
         grid-template-columns: 1fr;
@@ -1667,27 +1927,33 @@
     .section-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 15px;
     }
     
     .section-actions {
         width: 100%;
-        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+    
+    .photos-table {
+        font-size: 0.9rem;
+    }
+    
+    .photos-table th,
+    .photos-table td {
+        padding: 10px;
     }
     
     .action-buttons {
-        flex-wrap: wrap;
+        flex-direction: column;
     }
     
-    .btn {
+    .btn-action {
         width: 100%;
     }
     
     .tool-buttons {
         grid-template-columns: 1fr;
-    }
-    
-    .btn-emergency {
-        grid-column: 1;
     }
     
     .action-buttons-grid {
@@ -1702,28 +1968,16 @@
 
 @media (max-width: 480px) {
     .admin-header h1 {
-        font-size: 1.4rem;
+        font-size: 1.6rem;
     }
     
-    .server-info {
-        flex-direction: column;
-        gap: 10px;
-        align-items: center;
+    .status-grid {
+        grid-template-columns: 1fr;
     }
     
     .stat-card {
         flex-direction: column;
         text-align: center;
-    }
-    
-    .stat-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 1.5rem;
-    }
-    
-    .stat-number {
-        font-size: 1.8rem;
     }
     
     .action-buttons-grid {
@@ -1732,571 +1986,9 @@
     
     .table-footer {
         flex-direction: column;
+        gap: 15px;
         align-items: flex-start;
-    }
-    
-    .table-actions {
-        width: 100%;
-        flex-direction: column;
-    }
-    
-    .modal-header {
-        padding: 15px 20px;
-    }
-    
-    .modal-body {
-        padding: 20px;
     }
 }
 </style>
-
-<script>
-// ============================================
-// Device Management
-// ============================================
-const DeviceManager = {
-    async saveLimits() {
-        const maxCapture = parseInt(document.getElementById('maxCaptureDevices').value);
-        const maxQr = parseInt(document.getElementById('maxQrDevices').value);
-        
-        try {
-            const response = await fetch('/api/save_settings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    max_capture_devices: maxCapture,
-                    max_qr_devices: maxQr
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                showMessage('💾 บันทึกการตั้งค่าเรียบร้อย', 'success');
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                showMessage('❌ เกิดข้อผิดพลาด: ' + (data.error || 'ไม่ทราบสาเหตุ'), 'error');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showMessage('❌ ไม่สามารถบันทึกได้', 'error');
-        }
-    },
-
-    async kickAll(type) {
-        const typeName = type === 'capture' ? 'หน้าถ่ายรูป' : 'หน้าแสดง QR';
-        
-        if (!confirm(`ต้องการไล่เครื่องทั้งหมดออกจาก${typeName}หรือไม่?`)) {
-            return;
-        }
-        
-        try {
-            const response = await fetch('/api/clear_all_sessions', {
-                method: 'POST'
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                showMessage('✅ ไล่ออกทั้งหมดเรียบร้อย', 'success');
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                showMessage('❌ เกิดข้อผิดพลาด: ' + (data.error || 'ไม่ทราบสาเหตุ'), 'error');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showMessage('❌ ไม่สามารถดำเนินการได้', 'error');
-        }
-    }
-};
-
-// ============================================
-// Session Management
-// ============================================
-const SessionManager = {
-    async refresh() {
-        try {
-            const response = await fetch('/api/session_status');
-            const data = await response.json();
-            
-            document.getElementById('captureCount').textContent = data.capture?.active || 0;
-            document.getElementById('qrCount').textContent = data.qr?.active || 0;
-            
-            const captureFill = document.querySelector('[data-type="capture"]');
-            const qrFill = document.querySelector('[data-type="qr"]');
-            
-            if (captureFill && data.capture?.max > 0) {
-                captureFill.style.width = (data.capture.active / data.capture.max * 100) + '%';
-            }
-            
-            if (qrFill && data.qr?.max > 0) {
-                qrFill.style.width = (data.qr.active / data.qr.max * 100) + '%';
-            }
-            
-            showMessage('🔄 รีเฟรชข้อมูลเรียบร้อย', 'success');
-        } catch (error) {
-            console.error('Error:', error);
-            showMessage('⚠️ ไม่สามารถรีเฟรชข้อมูลได้', 'info');
-        }
-    },
-
-    async clearAll() {
-        if (!confirm('⚠️ ต้องการล้าง Session ทั้งหมดหรือไม่?\n\nเครื่องทั้งหมดจะถูกไล่ออก!')) {
-            return;
-        }
-        
-        try {
-            const response = await fetch('/api/clear_all_sessions', {
-                method: 'POST'
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                showMessage('🗑️ ล้าง Session ทั้งหมดเรียบร้อย', 'success');
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                showMessage('❌ ไม่สามารถล้างได้', 'error');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showMessage('❌ ไม่สามารถล้างได้', 'error');
-        }
-    }
-};
-
-// ============================================
-// Camera Control Functions
-// ============================================
-function unlockCamera() {
-    if (confirm('ยืนยันการปลดล็อคเครื่องถ่ายรูป?\nเครื่องจะสามารถถ่ายรูปได้ทันที')) {
-        fetch('/api/unlock_camera', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showMessage('ปลดล็อคเครื่องถ่ายรูปเรียบร้อยแล้ว', 'success');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showMessage('ไม่สามารถปลดล็อคได้: ' + (data.error || 'ไม่ทราบสาเหตุ'), 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showMessage('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
-            });
-    }
-}
-
-function forceUnlock() {
-    if (confirm('⚠️ ต้องการปลดล็อคทันทีโดยไม่ต้องสแกน QR?\nการกระทำนี้อาจทำให้ผู้ใช้ไม่สามารถรับรูปได้')) {
-        fetch('/api/unlock_camera', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showMessage('ปลดล็อคฉุกเฉินสำเร็จ', 'success');
-                    setTimeout(() => location.reload(), 1000);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showMessage('เกิดข้อผิดพลาด', 'error');
-            });
-    }
-}
-
-function lockCameraTest() {
-    showModal('ทดสอบล็อคเครื่อง', `
-        <p>ฟังก์ชันนี้ใช้สำหรับทดสอบระบบล็อคเครื่อง</p>
-        <p>ระบบจะสร้างรูปทดสอบและล็อคเครื่องชั่วคราว</p>
-        <div style="text-align: center; margin: 20px 0;">
-            <button onclick="createTestLock()" class="btn btn-info" style="font-size: 1rem; padding: 12px 25px;">
-                <i class="fas fa-vial"></i> ดำเนินการทดสอบ
-            </button>
-        </div>
-    `);
-}
-
-function createTestLock() {
-    showMessage('⚠️ API ทดสอบต้องตั้งค่าเพิ่มเติม', 'info');
-    closeModal();
-}
-
-// ============================================
-// QR Control Functions
-// ============================================
-function clearQR() {
-    if (confirm('ยืนยันการล้าง QR ล่าสุด?\nQR บนจอแสดงจะหายไป')) {
-        fetch('/api/clear_qr', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showMessage('ล้าง QR ล่าสุดเรียบร้อยแล้ว', 'success');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showMessage('ไม่สามารถล้าง QR ได้', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showMessage('เกิดข้อผิดพลาด', 'error');
-            });
-    }
-}
-
-function viewQR(code) {
-    window.open(`/scan/${code}`, '_blank');
-}
-
-function createTestQR() {
-    showMessage('⚠️ API สร้าง QR ทดสอบต้องตั้งค่าเพิ่มเติม', 'info');
-}
-
-// ============================================
-// Photo Management Functions
-// ============================================
-function deletePhoto(code) {
-    if (confirm(`ยืนยันการลบรูปรหัส ${code}?\nการกระทำนี้ไม่สามารถย้อนกลับได้`)) {
-        fetch(`/api/delete/${code}`, { method: 'DELETE' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showMessage(`ลบรูป ${code} เรียบร้อย`, 'success');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showMessage('ลบไม่สำเร็จ: ' + (data.error || 'ไม่ทราบสาเหตุ'), 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showMessage('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
-            });
-    }
-}
-
-function downloadPhotoZip(code) {
-    window.open(`/api/download_all/${code}`, '_blank');
-}
-
-function clearAllPhotos() {
-    if (confirm('⚠️ ต้องการลบรูปทั้งหมดใช่หรือไม่?\nการกระทำนี้จะลบทุกรูปและสถิติ!\nไม่สามารถย้อนกลับได้!')) {
-        if (prompt('พิมพ์ "DELETE ALL PHOTOS" เพื่อยืนยัน:') === 'DELETE ALL PHOTOS') {
-            fetch('/api/clear_all_photos', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showMessage('ลบรูปทั้งหมดเรียบร้อยแล้ว', 'success');
-                        setTimeout(() => location.reload(), 2000);
-                    } else {
-                        showMessage('ไม่สามารถลบรูปทั้งหมดได้', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showMessage('เกิดข้อผิดพลาด', 'error');
-                });
-        }
-    }
-}
-
-function backupPhotos() {
-    showModal('Backup ข้อมูล', `
-        <p>ระบบจะสร้างไฟล์ Backup ข้อมูลทั้งหมด</p>
-        <div class="backup-options" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px;">
-            <button onclick="exportJSON()" class="btn btn-secondary">
-                <i class="fas fa-file-code"></i> Export JSON
-            </button>
-            <button onclick="exportCSV()" class="btn btn-secondary">
-                <i class="fas fa-file-csv"></i> Export CSV
-            </button>
-        </div>
-    `);
-}
-
-function exportJSON() {
-    window.open('/api/admin_data', '_blank');
-    closeModal();
-}
-
-function exportCSV() {
-    showMessage('⚠️ API Export CSV ต้องตั้งค่าเพิ่มเติม', 'info');
-    closeModal();
-}
-
-// ============================================
-// System Functions
-// ============================================
-function saveSettings() {
-    const retakeLimit = document.getElementById('retakeLimit').value;
-    const maxPhotos = document.getElementById('maxPhotos').value;
-    
-    fetch('/api/save_settings', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            retake_limit: parseInt(retakeLimit),
-            max_photos: parseInt(maxPhotos)
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showMessage('บันทึกการตั้งค่าเรียบร้อยแล้ว', 'success');
-        } else {
-            showMessage('บันทึกไม่สำเร็จ: ' + (data.error || 'ไม่ทราบสาเหตุ'), 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessage('เกิดข้อผิดพลาดในการบันทึก', 'error');
-    });
-}
-
-function resetSettings() {
-    document.getElementById('retakeLimit').value = '1';
-    document.getElementById('maxPhotos').value = '3';
-    showMessage('รีเซ็ตการตั้งค่าเป็นค่าเริ่มต้นแล้ว', 'success');
-}
-
-function restartCamera() {
-    showMessage('⚠️ API รีสตาร์ทกล้องต้องตั้งค่าเพิ่มเติม', 'info');
-}
-
-function checkDiskSpace() {
-    fetch('/api/system_info')
-        .then(response => response.json())
-        .then(data => {
-            if (data.disk_percent) {
-                showModal('พื้นที่ดิสก์', `
-                    <div class="disk-info">
-                        <div class="disk-usage" style="margin-bottom: 20px;">
-                            <div class="progress-bar" style="margin-bottom: 10px;">
-                                <div class="progress-fill" style="width: ${data.disk_percent}%; background: #4299e1;"></div>
-                            </div>
-                            <div style="text-align: center; font-size: 1.5rem; font-weight: 700; color: #2d3748;">
-                                ${data.disk_percent}%
-                            </div>
-                        </div>
-                        <div class="disk-stats">
-                            <p><strong>ใช้ไป:</strong> ${data.disk_used_gb || 'N/A'} GB</p>
-                            <p><strong>คงเหลือ:</strong> ${data.disk_free_gb || 'N/A'} GB</p>
-                            <p><strong>ทั้งหมด:</strong> ${data.disk_total_gb || 'N/A'} GB</p>
-                        </div>
-                    </div>
-                `);
-            } else {
-                showMessage('ไม่สามารถดึงข้อมูลพื้นที่ดิสก์ได้', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('ไม่สามารถตรวจสอบพื้นที่ดิสก์ได้', 'error');
-        });
-}
-
-function systemDiagnostic() {
-    fetch('/api/status')
-        .then(response => response.json())
-        .then(data => {
-            showModal('วินิจฉัยระบบ', `
-                <div class="diagnostic-info">
-                    <p><strong>สถานะเซิร์ฟเวอร์:</strong> <span style="color: #48bb78;">${data.status || 'OK'}</span></p>
-                    <p><strong>รูปทั้งหมด:</strong> ${data.total_photos || 0}</p>
-                    <p><strong>เซสชันทั้งหมด:</strong> ${data.total_sessions || 0}</p>
-                    <p><strong>ดาวน์โหลดทั้งหมด:</strong> ${data.total_downloads || 0}</p>
-                    <p><strong>สถานะกล้อง:</strong> ${data.camera_locked ? 'ล็อค' : 'ปลดล็อค'}</p>
-                    <p><strong>เวลาเซิร์ฟเวอร์:</strong> ${new Date(data.timestamp).toLocaleString('th-TH')}</p>
-                </div>
-            `);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('ไม่สามารถวินิจฉัยระบบได้', 'error');
-        });
-}
-
-function emergencyUnlock() {
-    if (confirm('⚠️ EMERGENCY UNLOCK ⚠️\nต้องการปลดล็อคระบบฉุกเฉินทั้งหมดใช่หรือไม่?\nการกระทำนี้จะ:\n1. ปลดล็อคเครื่องถ่ายรูป\n2. ล้าง QR ล่าสุด\n3. รีเซ็ตระบบ')) {
-        showMessage('⚠️ API ปลดล็อคฉุกเฉินต้องตั้งค่าเพิ่มเติม', 'info');
-    }
-}
-
-// ============================================
-// Quick Actions
-// ============================================
-function quickUnlock() {
-    unlockCamera();
-}
-
-function quickClearQR() {
-    clearQR();
-}
-
-function quickRefresh() {
-    location.reload();
-}
-
-function quickStats() {
-    SessionManager.refresh();
-}
-
-function quickBackup() {
-    backupPhotos();
-}
-
-function quickTest() {
-    showModal('ทดสอบระบบ', `
-        <p>ฟังก์ชันทดสอบระบบ Photo Booth</p>
-        <div style="text-align: center; margin: 20px 0;">
-            <p><i class="fas fa-check-circle" style="color: #48bb78; font-size: 3rem;"></i></p>
-            <p>ระบบพร้อมใช้งาน</p>
-            <p style="color: #718096; font-size: 0.9rem; margin-top: 15px;">
-                เบราว์เซอร์ที่แนะนำ: Chrome, Edge, Safari<br>
-                รองรับ WebRTC ทุกรุ่น
-            </p>
-        </div>
-    `);
-}
-
-// ============================================
-// Export Functions
-// ============================================
-function exportAllData() {
-    window.open('/api/admin_data', '_blank');
-}
-
-function refreshData() {
-    location.reload();
-}
-
-function createSampleData() {
-    if (confirm('สร้างข้อมูลตัวอย่าง?\nจะมีการเพิ่มรูปและสถิติเทียม')) {
-        showMessage('⚠️ API สร้างข้อมูลตัวอย่างต้องตั้งค่าเพิ่มเติม', 'info');
-    }
-}
-
-function clearCache() {
-    if (confirm('ล้างแคชเบราว์เซอร์?\nอาจต้องล็อกอินใหม่ในบางหน้า')) {
-        if (caches && caches.keys) {
-            caches.keys().then(function(names) {
-                for (let name of names) caches.delete(name);
-                showMessage('ล้างแคชสำเร็จ', 'success');
-            });
-        } else {
-            showMessage('เบราว์เซอร์ไม่รองรับการล้างแคช', 'info');
-        }
-    }
-}
-
-function viewLogs() {
-    showMessage('⚠️ API ดู Logs ต้องตั้งค่าเพิ่มเติม', 'info');
-}
-
-// ============================================
-// Utility Functions
-// ============================================
-function showMessage(text, type = 'info') {
-    const existingMessages = document.querySelectorAll('.message');
-    existingMessages.forEach(msg => msg.remove());
-    
-    const message = document.createElement('div');
-    message.className = `message message-${type}`;
-    
-    let icon = 'info-circle';
-    if (type === 'success') icon = 'check-circle';
-    if (type === 'error') icon = 'exclamation-circle';
-    
-    message.innerHTML = `<i class="fas fa-${icon}"></i> ${text}`;
-    document.body.appendChild(message);
-    
-    setTimeout(() => {
-        message.style.opacity = '0';
-        setTimeout(() => message.remove(), 500);
-    }, 3000);
-}
-
-function showModal(title, content) {
-    document.getElementById('modalTitle').textContent = title;
-    document.getElementById('modalBody').innerHTML = content;
-    document.getElementById('infoModal').style.display = 'block';
-}
-
-function closeModal() {
-    document.getElementById('infoModal').style.display = 'none';
-}
-
-function copyCode(code) {
-    navigator.clipboard.writeText(code).then(() => {
-        showMessage(`คัดลอกรหัส ${code} เรียบร้อย`, 'success');
-    }).catch(() => {
-        showMessage('ไม่สามารถคัดลอกรหัสได้', 'error');
-    });
-}
-
-// ============================================
-// Time Functions
-// ============================================
-function updateTime() {
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('th-TH');
-    const dateStr = now.toLocaleDateString('th-TH', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    
-    const currentTimeEl = document.getElementById('currentTime');
-    if (currentTimeEl) {
-        currentTimeEl.textContent = timeStr;
-    }
-    
-    const serverTimeEl = document.getElementById('serverTime');
-    if (serverTimeEl) {
-        serverTimeEl.textContent = `${dateStr} ${timeStr}`;
-    }
-}
-
-// ============================================
-// Initialize
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    // อัปเดตเวลาปัจจุบัน
-    updateTime();
-    setInterval(updateTime, 1000);
-    
-    // ตั้งค่าการตรวจสอบสถานะอัตโนมัติ
-    setInterval(() => {
-        fetch('/api/camera_status')
-            .then(response => response.json())
-            .then(data => {
-                const statusEl = document.getElementById('cameraStatusLive');
-                if (statusEl) {
-                    if (data.camera_locked) {
-                        statusEl.className = 'status-indicator status-locked';
-                        statusEl.innerHTML = '<i class="fas fa-lock"></i> ล็อค';
-                    } else {
-                        statusEl.className = 'status-indicator status-unlocked';
-                        statusEl.innerHTML = '<i class="fas fa-unlock"></i> ปลดล็อค';
-                    }
-                }
-            })
-            .catch(error => console.error('Error fetching camera status:', error));
-    }, 10000);
-    
-    // ปิด modal เมื่อกดนอก
-    window.onclick = function(event) {
-        const modal = document.getElementById('infoModal');
-        if (event.target == modal) {
-            closeModal();
-        }
-    };
-    
-    // รีเฟรชข้อมูล session อัตโนมัติ
-    setInterval(() => {
-        SessionManager.refresh();
-    }, 30000);
-});
-</script>
 {% endblock %}
