@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚫 ไม่สามารถเข้าถึงได้ - Photo Booth</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background Animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+            animation: float 25s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(30px, -30px) rotate(3deg); }
+        }
+
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: clamp(40px, 8vw, 60px);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            animation: slideIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .icon {
+            font-size: clamp(5rem, 15vw, 8rem);
+            margin-bottom: 30px;
+            animation: shake 0.8s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            color: #e53e3e;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .message {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: #555;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-radius: 15px;
+            padding: clamp(20px, 4vw, 30px);
+            margin: 30px 0;
+            border-left: 5px solid #e53e3e;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: #333;
+        }
+
+        .info-item:not(:last-child) {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .info-value {
+            font-weight: 700;
+            color: #e53e3e;
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+        }
+
+        .retry-section {
+            margin-top: 40px;
+        }
+
+        .retry-text {
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .countdown {
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 800;
+            color: #667eea;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: clamp(15px, 3vw, 18px) clamp(30px, 6vw, 40px);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            font-family: 'Kanit', sans-serif;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #718096, #4a5568);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 8px 20px rgba(113, 128, 150, 0.4);
+        }
+
+        .suggestion {
+            margin-top: 40px;
+            padding: 25px;
+            background: linear-gradient(135deg, #fff5e6, #ffe9cc);
+            border-radius: 15px;
+            border: 2px dashed #ff8b42;
+        }
+
+        .suggestion h3 {
+            color: #ff8b42;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .suggestion p {
+            color: #666;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+
+            .info-item {
+                flex-direction: column;
+                gap: 5px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🚫</div>
+        <h1>ไม่สามารถเข้าถึงได้</h1>
+        <p class="message">
+            {{ page_name }} มีเครื่องที่เปิดใช้งานครบจำนวนที่กำหนดแล้ว<br>
+            กรุณารอสักครู่หรือติดต่อเจ้าหน้าที่
+        </p>
+
+        <div class="info-box">
+            <div class="info-item">
+                <span class="info-label">📱 หน้าที่พยายามเข้าถึง:</span>
+                <span class="info-value">{{ page_name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">🖥️ เครื่องที่กำลังใช้งาน:</span>
+                <span class="info-value">{{ current_devices }} เครื่อง</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">✅ จำนวนเครื่องสูงสุด:</span>
+                <span class="info-value">{{ max_devices }} เครื่อง</span>
+            </div>
+        </div>
+
+        <div class="retry-section">
+            <p class="retry-text">🔄 กำลังลองใหม่อัตโนมัติใน...</p>
+            <div class="countdown" id="countdown">10</div>
+            <button onclick="retryNow()" class="btn">
+                ลองเข้าใหม่ทันที
+            </button>
+            <a href="/admin" class="btn btn-secondary">
+                ไปหน้า Admin
+            </a>
+        </div>
+
+        <div class="suggestion">
+            <h3>💡 คำแนะนำ</h3>
+            <p>
+                หากคุณเป็นผู้ดูแลระบบ สามารถเพิ่มจำนวนเครื่องสูงสุดได้ที่หน้า <strong>Admin</strong> 
+                หรือไล่เครื่องที่ไม่ได้ใช้งานออกเพื่อเปิดที่ว่าง
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let countdown = 10;
+        const countdownEl = document.getElementById('countdown');
+
+        function retryNow() {
+            window.location.reload();
+        }
+
+        // Countdown and auto-retry
+        const interval = setInterval(() => {
+            countdown--;
+            countdownEl.textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(interval);
+                retryNow();
+            }
+        }, 1000);
+
+        // เพิ่ม animation สำหรับ countdown
+        setInterval(() => {
+            countdownEl.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                countdownEl.style.transform = 'scale(1)';
+            }, 100);
+        }, 1000);
+    </script>
+</body>
+</html>
