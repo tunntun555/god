@@ -6,7 +6,7 @@ import base64
 from datetime import datetime
 from io import BytesIO
 
-from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, send_from_directory, Response
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, send_from_directory, Response, make_response
 
 # สร้าง Flask app
 app = Flask(__name__, 
@@ -20,11 +20,20 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['DATA_FILE'] = os.path.join(BASE_DIR, 'photobooth_data.json')
 app.config['LOCK_FILE'] = os.path.join(BASE_DIR, 'camera_lock.json')
+app.config['SETTINGS_FILE'] = os.path.join(BASE_DIR, 'system_settings.json')
+app.config['SESSIONS_FILE'] = os.path.join(BASE_DIR, 'active_sessions.json')
 
 # *** เปลี่ยนจากบันทึกในดิสก์เป็นบันทึกใน RAM ***
 # Dictionary เก็บรูปภาพใน memory (RAM)
 # โครงสร้าง: {filename: bytes_data}
 PHOTOS_IN_MEMORY = {}
+
+# *** ระบบจำกัดจำนวนเครื่อง ***
+# เก็บ Session ID ของเครื่องที่เข้าถึงแต่ละหน้า
+ACTIVE_SESSIONS = {
+    'capture': set(),  # Session IDs ของหน้าถ่ายรูป
+    'qr': set()        # Session IDs ของหน้าสแกน QR
+}
 
 # สร้างโฟลเดอร์สำหรับ static และ templates เท่านั้น (ไม่ต้องสร้างโฟลเดอร์ photos)
 os.makedirs('static', exist_ok=True)
@@ -68,6 +77,104 @@ def save_lock_status(status):
     with open(app.config['LOCK_FILE'], 'w', encoding='utf-8') as f:
         json.dump(status, f, ensure_ascii=False, indent=2)
 
+def load_settings():
+    """โหลดการตั้งค่าระบบ"""
+    try:
+        with open(app.config['SETTINGS_FILE'], 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        # ค่าเริ่มต้น
+        default_settings = {
+            'max_capture_devices': 1,  # จำกัดเครื่องถ่ายรูป 1 เครื่อง
+            'max_qr_devices': 1,       # จำกัดเครื่องแสดง QR 1 เครื่อง
+            'max_photos_per_session': 3,
+            'retake_limit': 1
+        }
+        save_settings(default_settings)
+        return default_settings
+
+def save_settings(settings):
+    """บันทึกการตั้งค่าระบบ"""
+    with open(app.config['SETTINGS_FILE'], 'w', encoding='utf-8') as f:
+        json.dump(settings, f, ensure_ascii=False, indent=2)
+
+def cleanup_expired_sessions():
+    """ล้าง Session ที่หมดอายุ (เกิน 30 นาที)"""
+    from datetime import datetime, timedelta
+    
+    try:
+        with open(app.config['SESSIONS_FILE'], 'r', encoding='utf-8') as f:
+            sessions_data = json.load(f)
+    except FileNotFoundError:
+        sessions_data = {'capture': {}, 'qr': {}}
+    
+    now = datetime.now()
+    cutoff_time = now - timedelta(minutes=30)
+    
+    # ล้าง session เก่า
+    for page_type in ['capture', 'qr']:
+        expired = []
+        for session_id, last_seen in sessions_data.get(page_type, {}).items():
+            try:
+                last_seen_dt = datetime.fromisoformat(last_seen)
+                if last_seen_dt < cutoff_time:
+                    expired.append(session_id)
+            except:
+                expired.append(session_id)
+        
+        # ลบ session ที่หมดอายุ
+        for session_id in expired:
+            sessions_data[page_type].pop(session_id, None)
+            ACTIVE_SESSIONS[page_type].discard(session_id)
+    
+    # บันทึกกลับ
+    with open(app.config['SESSIONS_FILE'], 'w', encoding='utf-8') as f:
+        json.dump(sessions_data, f, ensure_ascii=False, indent=2)
+    
+    return sessions_data
+
+def register_session(page_type, session_id):
+    """ลงทะเบียน session ใหม่"""
+    from datetime import datetime
+    
+    # โหลดข้อมูล session
+    try:
+        with open(app.config['SESSIONS_FILE'], 'r', encoding='utf-8') as f:
+            sessions_data = json.load(f)
+    except FileNotFoundError:
+        sessions_data = {'capture': {}, 'qr': {}}
+    
+    if page_type not in sessions_data:
+        sessions_data[page_type] = {}
+    
+    # บันทึกเวลาล่าสุด
+    sessions_data[page_type][session_id] = datetime.now().isoformat()
+    
+    # บันทึกกลับ
+    with open(app.config['SESSIONS_FILE'], 'w', encoding='utf-8') as f:
+        json.dump(sessions_data, f, ensure_ascii=False, indent=2)
+    
+    # เพิ่มใน RAM
+    ACTIVE_SESSIONS[page_type].add(session_id)
+
+def check_device_limit(page_type):
+    """ตรวจสอบว่าเกินจำนวนเครื่องที่กำหนดหรือไม่"""
+    settings = load_settings()
+    
+    # ล้าง session หมดอายุก่อน
+    cleanup_expired_sessions()
+    
+    if page_type == 'capture':
+        max_devices = settings.get('max_capture_devices', 1)
+        current = len(ACTIVE_SESSIONS['capture'])
+    elif page_type == 'qr':
+        max_devices = settings.get('max_qr_devices', 1)
+        current = len(ACTIVE_SESSIONS['qr'])
+    else:
+        return True  # หน้าอื่นไม่จำกัด
+    
+    return current < max_devices
+
 def generate_qr_code(url):
     """สร้าง QR Code จาก URL"""
     qr = qrcode.QRCode(
@@ -93,23 +200,80 @@ def index():
 
 @app.route('/capture')
 def capture():
-    """หน้าเครื่องถ่ายรูป"""
+    """หน้าเครื่องถ่ายรูป - จำกัดจำนวนเครื่อง"""
+    # ตรวจสอบจำนวนเครื่อง
+    session_id = request.cookies.get('session_id')
+    
+    # ถ้าไม่มี session_id หรือ session_id ไม่อยู่ในระบบ
+    if not session_id or session_id not in ACTIVE_SESSIONS['capture']:
+        # ตรวจสอบว่าเต็มหรือยัง
+        if not check_device_limit('capture'):
+            settings = load_settings()
+            max_devices = settings.get('max_capture_devices', 1)
+            return render_template('access_denied.html', 
+                                 page_name='หน้าถ่ายรูป',
+                                 max_devices=max_devices,
+                                 current_devices=len(ACTIVE_SESSIONS['capture']))
+        
+        # สร้าง session ใหม่
+        import uuid
+        session_id = str(uuid.uuid4())
+        register_session('capture', session_id)
+    else:
+        # อัปเดตเวลา heartbeat
+        register_session('capture', session_id)
+    
     lock_status = load_lock_status()
-    return render_template('capture.html', 
+    resp = make_response(render_template('capture.html', 
                           camera_locked=lock_status['camera_locked'],
                           retake_available=lock_status['retake_available'],
-                          camera_enabled=lock_status['camera_enabled'])
+                          camera_enabled=lock_status['camera_enabled']))
+    resp.set_cookie('session_id', session_id, max_age=60*60*2)  # 2 ชั่วโมง
+    return resp
 
 @app.route('/qr')
 def qr_display():
-    """หน้าเครื่องแสดง QR"""
-    return render_template('qr_display.html')
+    """หน้าเครื่องแสดง QR - จำกัดจำนวนเครื่อง"""
+    # ตรวจสอบจำนวนเครื่อง
+    session_id = request.cookies.get('session_id')
+    
+    # ถ้าไม่มี session_id หรือ session_id ไม่อยู่ในระบบ
+    if not session_id or session_id not in ACTIVE_SESSIONS['qr']:
+        # ตรวจสอบว่าเต็มหรือยัง
+        if not check_device_limit('qr'):
+            settings = load_settings()
+            max_devices = settings.get('max_qr_devices', 1)
+            return render_template('access_denied.html', 
+                                 page_name='หน้าแสดง QR',
+                                 max_devices=max_devices,
+                                 current_devices=len(ACTIVE_SESSIONS['qr']))
+        
+        # สร้าง session ใหม่
+        import uuid
+        session_id = str(uuid.uuid4())
+        register_session('qr', session_id)
+    else:
+        # อัปเดตเวลา heartbeat
+        register_session('qr', session_id)
+    
+    resp = make_response(render_template('qr_display.html'))
+    resp.set_cookie('session_id', session_id, max_age=60*60*2)  # 2 ชั่วโมง
+    return resp
 
 @app.route('/admin')
 def admin():
     """หน้าแอดมิน"""
     data = load_data()
     lock_status = load_lock_status()
+    settings = load_settings()
+    
+    # ล้าง session หมดอายุ
+    cleanup_expired_sessions()
+    
+    # นับจำนวนเครื่องที่ active
+    active_capture = len(ACTIVE_SESSIONS['capture'])
+    active_qr = len(ACTIVE_SESSIONS['qr'])
+    
     # แปลง reversed iterator เป็น list
     reversed_photos = list(reversed(data['photos']))
     return render_template('admin.html', 
@@ -117,7 +281,10 @@ def admin():
                           stats=data['stats'],
                           latest_qr=data.get('latest_qr'),
                           camera_locked=lock_status['camera_locked'],
-                          locked_by_code=lock_status['locked_by_code'])
+                          locked_by_code=lock_status['locked_by_code'],
+                          settings=settings,
+                          active_capture=active_capture,
+                          active_qr=active_qr)
 
 
 @app.route('/api/full_status')
@@ -600,16 +767,34 @@ def export_csv():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/save_settings', methods=['POST'])
-def save_settings():
+def save_settings_api():
     """API บันทึกการตั้งค่าระบบ"""
     try:
         data = request.get_json()
-        # ในเวอร์ชันนี้แค่คืนค่า success
-        # สามารถขยายได้ในอนาคต
+        
+        # โหลดการตั้งค่าปัจจุบัน
+        current_settings = load_settings()
+        
+        # อัปเดตการตั้งค่า
+        if 'max_capture_devices' in data:
+            current_settings['max_capture_devices'] = int(data['max_capture_devices'])
+        
+        if 'max_qr_devices' in data:
+            current_settings['max_qr_devices'] = int(data['max_qr_devices'])
+        
+        if 'max_photos_per_session' in data:
+            current_settings['max_photos_per_session'] = int(data['max_photos_per_session'])
+        
+        if 'retake_limit' in data:
+            current_settings['retake_limit'] = int(data['retake_limit'])
+        
+        # บันทึก
+        save_settings(current_settings)
+        
         return jsonify({
             'success': True,
             'message': 'บันทึกการตั้งค่าเรียบร้อย',
-            'settings': data
+            'settings': current_settings
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -634,6 +819,100 @@ def emergency_unlock():
             'success': True,
             'message': 'ปลดล็อคฉุกเฉินสำเร็จ'
         })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/session_status')
+def session_status():
+    """API ดูสถานะ session ทั้งหมด"""
+    try:
+        # ล้าง session หมดอายุก่อน
+        cleanup_expired_sessions()
+        
+        settings = load_settings()
+        
+        return jsonify({
+            'capture': {
+                'active': len(ACTIVE_SESSIONS['capture']),
+                'max': settings.get('max_capture_devices', 1),
+                'sessions': list(ACTIVE_SESSIONS['capture'])
+            },
+            'qr': {
+                'active': len(ACTIVE_SESSIONS['qr']),
+                'max': settings.get('max_qr_devices', 1),
+                'sessions': list(ACTIVE_SESSIONS['qr'])
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/kick_session', methods=['POST'])
+def kick_session():
+    """API ไล่ session ออก"""
+    try:
+        data = request.get_json()
+        page_type = data.get('page_type')  # 'capture' หรือ 'qr'
+        session_id = data.get('session_id')
+        
+        if page_type not in ['capture', 'qr']:
+            return jsonify({'error': 'page_type ไม่ถูกต้อง'}), 400
+        
+        # ลบ session
+        ACTIVE_SESSIONS[page_type].discard(session_id)
+        
+        # ลบจากไฟล์
+        try:
+            with open(app.config['SESSIONS_FILE'], 'r', encoding='utf-8') as f:
+                sessions_data = json.load(f)
+            
+            if page_type in sessions_data:
+                sessions_data[page_type].pop(session_id, None)
+            
+            with open(app.config['SESSIONS_FILE'], 'w', encoding='utf-8') as f:
+                json.dump(sessions_data, f, ensure_ascii=False, indent=2)
+        except:
+            pass
+        
+        return jsonify({
+            'success': True,
+            'message': f'ไล่ session {session_id[:8]}... ออกแล้ว'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/clear_all_sessions', methods=['POST'])
+def clear_all_sessions():
+    """API ล้าง session ทั้งหมด"""
+    try:
+        # ล้าง RAM
+        ACTIVE_SESSIONS['capture'].clear()
+        ACTIVE_SESSIONS['qr'].clear()
+        
+        # ล้างไฟล์
+        sessions_data = {'capture': {}, 'qr': {}}
+        with open(app.config['SESSIONS_FILE'], 'w', encoding='utf-8') as f:
+            json.dump(sessions_data, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({
+            'success': True,
+            'message': 'ล้าง session ทั้งหมดเรียบร้อย'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/heartbeat', methods=['POST'])
+def heartbeat():
+    """API สำหรับ heartbeat - อัปเดตเวลาล่าสุดของ session"""
+    try:
+        data = request.get_json()
+        page_type = data.get('page_type')  # 'capture' หรือ 'qr'
+        session_id = request.cookies.get('session_id')
+        
+        if page_type in ['capture', 'qr'] and session_id:
+            register_session(page_type, session_id)
+            return jsonify({'success': True})
+        
+        return jsonify({'error': 'Invalid request'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
