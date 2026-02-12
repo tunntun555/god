@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>📸 Photo Booth</title>
+	<title>📸 Photo Booth - ถ่ายรูปกับกรอบ</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -284,59 +284,6 @@
 			animation: fadeIn 0.8s ease 0.6s both;
 		}
 
-		.settings {
-			display: flex;
-			justify-content: center;
-			margin-bottom: 30px;
-		}
-
-		.setting-group {
-			display: flex;
-			align-items: center;
-			gap: 15px;
-			background: rgba(255, 255, 255, 0.05);
-			backdrop-filter: blur(10px);
-			border: 1px solid rgba(255, 255, 255, 0.1);
-			padding: 15px 25px;
-			border-radius: 50px;
-			transition: all 0.3s ease;
-		}
-
-		.setting-group:hover {
-			background: rgba(255, 255, 255, 0.08);
-			transform: translateY(-2px);
-		}
-
-		.setting-group label {
-			font-weight: 600;
-			color: var(--text);
-			font-size: 1rem;
-		}
-
-		.setting-group select {
-			padding: 10px 20px;
-			border-radius: 25px;
-			border: 2px solid rgba(255, 255, 255, 0.2);
-			background: rgba(255, 255, 255, 0.1);
-			color: var(--text);
-			font-size: 1rem;
-			font-weight: 600;
-			cursor: pointer;
-			transition: all 0.3s ease;
-			font-family: 'Barlow', sans-serif;
-		}
-
-		.setting-group select:hover {
-			background: rgba(255, 255, 255, 0.15);
-			border-color: var(--primary);
-		}
-
-		.setting-group select option {
-			background: var(--dark);
-			color: var(--text);
-		}
-
-		/* Buttons */
 		.buttons {
 			display: flex;
 			gap: 15px;
@@ -410,6 +357,12 @@
 			color: var(--text);
 			border: 2px solid rgba(255, 255, 255, 0.2);
 			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+		}
+
+		.btn-frame {
+			background: linear-gradient(135deg, var(--secondary), #3DBDB4);
+			color: white;
+			box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4);
 		}
 
 		.btn:disabled {
@@ -571,6 +524,129 @@
 			font-weight: 600;
 		}
 
+		/* Frame Modal */
+		.frame-modal {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.9);
+			z-index: 9999;
+			overflow-y: auto;
+			padding: 20px;
+			display: none;
+		}
+
+		.frame-modal-content {
+			max-width: 1200px;
+			margin: 0 auto;
+			background: var(--dark-light);
+			border-radius: 20px;
+			padding: 30px;
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+		}
+
+		.frame-modal-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 30px;
+			color: var(--text);
+		}
+
+		.frame-modal-header h2 {
+			font-size: 2rem;
+			margin: 0;
+		}
+
+		.close-modal {
+			background: none;
+			border: none;
+			color: var(--text);
+			font-size: 2.5rem;
+			cursor: pointer;
+			padding: 0;
+			width: 40px;
+			height: 40px;
+			line-height: 1;
+			transition: color 0.3s;
+		}
+
+		.close-modal:hover {
+			color: var(--primary);
+		}
+
+		.frame-options {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+			gap: 20px;
+		}
+
+		.frame-option {
+			background: rgba(255, 255, 255, 0.05);
+			border: 2px solid rgba(255, 255, 255, 0.1);
+			border-radius: 15px;
+			padding: 20px;
+			text-align: center;
+			transition: all 0.3s;
+		}
+
+		.frame-option:hover {
+			background: rgba(255, 255, 255, 0.08);
+			border-color: var(--primary);
+			transform: translateY(-5px);
+		}
+
+		.frame-preview {
+			min-height: 200px;
+			background: rgba(0, 0, 0, 0.3);
+			border-radius: 10px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			margin-bottom: 15px;
+			color: var(--text);
+			padding: 20px;
+		}
+
+		.frame-preview img {
+			max-width: 100%;
+			max-height: 200px;
+			border-radius: 8px;
+		}
+
+		.frame-option h3 {
+			color: var(--text);
+			font-size: 1.1rem;
+			margin-bottom: 10px;
+		}
+
+		.frame-option-info {
+			font-size: 0.85rem;
+			color: rgba(255, 255, 255, 0.6);
+			margin-bottom: 15px;
+		}
+
+		.select-frame-btn {
+			width: 100%;
+			padding: 12px;
+			background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+			border: none;
+			border-radius: 10px;
+			color: white;
+			font-size: 1rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s;
+		}
+
+		.select-frame-btn:hover {
+			transform: scale(1.05);
+			box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+		}
+
 		/* Responsive */
 		@media (max-width: 768px) {
 			.header h1 {
@@ -591,6 +667,10 @@
 
 			.countdown-text {
 				font-size: 100px;
+			}
+			
+			.frame-modal-content {
+				padding: 20px;
 			}
 		}
 
@@ -615,7 +695,7 @@
 		<!-- Header -->
 		<div class="header">
 			<h1>📸 PHOTO BOOTH</h1>
-			<p>ถ่ายรูปสวยๆ กับเรา</p>
+			<p>ถ่ายรูปสวยๆ กับกรอบสุดพิเศษ</p>
 		</div>
 
 		<!-- Status Bar -->
@@ -635,7 +715,7 @@
 				</div>
 				<div class="status-info">
 					<h3>รูปที่ถ่าย</h3>
-					<p><span id="photoCounter">0</span> / <span id="maxPhotos">2</span></p>
+					<p><span id="photoCounter">0</span> / <span id="maxPhotos">4</span></p>
 				</div>
 			</div>
 		</div>
@@ -656,20 +736,6 @@
 
 			<!-- Controls -->
 			<div class="controls">
-				<div class="settings">
-					<div class="setting-group">
-						<label for="photoCount">
-							<i class="fas fa-camera"></i> จำนวนรูป
-						</label>
-						<select id="photoCount">
-							<option value="1">1 รูป</option>
-							<option value="2" selected>2 รูป</option>
-							<option value="3">3 รูป</option>
-							<option value="4">4 รูป</option>
-						</select>
-					</div>
-				</div>
-
 				<div class="buttons">
 					<button id="captureBtn" class="btn btn-primary" onclick="capturePhoto()">
 						<i class="fas fa-camera"></i>
@@ -679,9 +745,13 @@
 						<i class="fas fa-redo"></i>
 						<span>ถ่ายใหม่</span>
 					</button>
+					<button id="frameBtn" class="btn btn-frame" onclick="showFrameSelection()" style="display: none;">
+						<i class="fas fa-border-all"></i>
+						<span>เลือกกรอบและบันทึก</span>
+					</button>
 					<button id="finishBtn" class="btn btn-success" onclick="finishSession()" style="display: none;">
 						<i class="fas fa-check-circle"></i>
-						<span>พอใจกับรูปนี้</span>
+						<span>บันทึก (ไม่ใช้กรอบ)</span>
 					</button>
 					<button id="resetBtn" class="btn btn-secondary" onclick="resetSessionWithConfirm()" style="display: none;">
 						<i class="fas fa-times-circle"></i>
@@ -703,6 +773,30 @@
 		</div>
 	</div>
 
+	<!-- Frame Selection Modal -->
+	<div id="frameModal" class="frame-modal">
+		<div class="frame-modal-content">
+			<div class="frame-modal-header">
+				<h2>🖼️ เลือกกรอบรูป</h2>
+				<button class="close-modal" onclick="closeFrameModal()">&times;</button>
+			</div>
+			
+			<div class="frame-options">
+				<!-- ตัวเลือกไม่ใช้กรอบ -->
+				<div class="frame-option" data-template-id="none">
+					<div class="frame-preview">
+						<i class="fas fa-images" style="font-size: 3rem; color: #666;"></i>
+						<p style="margin-top: 10px;">ไม่ใช้กรอบ (4 รูปแยก)</p>
+					</div>
+					<button class="select-frame-btn" onclick="selectFrame('none')">เลือก</button>
+				</div>
+				
+				<!-- แสดงกรอบจาก templates -->
+				<div id="frameTemplatesList"></div>
+			</div>
+		</div>
+	</div>
+
 	<script>
 		// ============================================
 		// Global Variables
@@ -712,11 +806,11 @@
 		let cameraPlaceholder = document.getElementById('cameraPlaceholder');
 		let captureBtn = document.getElementById('captureBtn');
 		let retakeBtn = document.getElementById('retakeBtn');
+		let frameBtn = document.getElementById('frameBtn');
 		let finishBtn = document.getElementById('finishBtn');
 		let resetBtn = document.getElementById('resetBtn');
 		let photoCounter = document.getElementById('photoCounter');
 		let maxPhotos = document.getElementById('maxPhotos');
-		let photoCountSelect = document.getElementById('photoCount');
 		let messageContainer = document.getElementById('messageContainer');
 		let previewSection = document.getElementById('previewSection');
 		let previewImages = document.getElementById('previewImages');
@@ -725,11 +819,12 @@
 		let cameraStatusText = document.getElementById('cameraStatusText');
 
 		let photos = [];
-		let currentMaxPhotos = 2;
+		let currentMaxPhotos = 4; // ถ่าย 4 รูปเท่านั้น
 		let currentPickupCode = null;
 		let isProcessing = false;
-		let cameraActive = false;
 		let retakeAvailable = true;
+		let selectedTemplateId = null;
+		let processingTimeout = null;
 
 		// ============================================
 		// Camera Functions
@@ -749,7 +844,6 @@
 				});
 				
 				return ready;
-				
 			} catch (error) {
 				console.error('Ready check error:', error);
 				return false;
@@ -761,26 +855,12 @@
 				const response = await fetch('/api/camera_status');
 				const data = await response.json();
 				
-				console.log('🔍 AutoReset Check:', {
-					camera_locked: data.camera_locked,
-					currentPickupCode: currentPickupCode,
-					photosLength: photos.length,
-					isProcessing: isProcessing
-				});
-				
 				if (!data.camera_locked && currentPickupCode && photos.length === 0) {
-					console.log('✅ เงื่อนไขรีเซ็ตผ่านทั้งหมด รีเซ็ตระบบ...');
-					
+					console.log('✅ เงื่อนไขรีเซ็ตผ่าน รีเซ็ตระบบ...');
 					performReset();
 					showMessage('✅ ระบบพร้อมใช้งานสำหรับผู้ใช้คนถัดไป', 'success', 3000);
-					
 					currentPickupCode = null;
 				}
-				
-				if (data.camera_locked && !currentPickupCode) {
-					console.log('⏳ รอเครื่องถูกล็อคโดยคนอื่น...');
-				}
-				
 			} catch (error) {
 				console.log('❌ ไม่สามารถตรวจสอบสถานะล็อคได้:', error);
 			}
@@ -795,22 +875,18 @@
 			previewSection.style.display = 'none';
 			
 			captureBtn.disabled = false;
-			captureBtn.innerHTML = '<i class="fas fa-camera"></i><span>เริ่มถ่ายรูป</span>';
 			captureBtn.style.display = 'inline-flex';
+			captureBtn.innerHTML = '<i class="fas fa-camera"></i><span>เริ่มถ่ายรูป</span>';
 			
 			retakeBtn.style.display = 'none';
-			retakeBtn.disabled = false;
-			retakeBtn.innerHTML = '<i class="fas fa-redo"></i><span>ถ่ายใหม่</span>';
-			
+			frameBtn.style.display = 'none';
 			finishBtn.style.display = 'none';
-			finishBtn.disabled = false;
-			finishBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>พอใจกับรูปนี้</span>';
-			
 			resetBtn.style.display = 'none';
 			
 			currentPickupCode = null;
 			retakeAvailable = true;
 			isProcessing = false;
+			selectedTemplateId = null;
 			
 			messageContainer.innerHTML = '';
 			
@@ -845,7 +921,6 @@
 				cameraStatusText.className = 'status-online';
 				
 				showMessage('✅ กล้องพร้อมใช้งาน!', 'success', 3000);
-				
 				captureBtn.disabled = false;
 
 			} catch (error) {
@@ -854,11 +929,9 @@
 				showCameraPlaceholder();
 				captureBtn.disabled = true;
 				
-				let errorMessage = '⚠️ ไม่สามารถเปิดกล้องได้';
 				cameraStatusText.textContent = 'ข้อผิดพลาด';
 				cameraStatusText.className = 'status-offline';
-				
-				showMessage(errorMessage, 'error');
+				showMessage('⚠️ ไม่สามารถเปิดกล้องได้', 'error');
 			}
 		}
 
@@ -877,7 +950,6 @@
 		// Photo Capture Functions
 		// ============================================
 		async function capturePhoto() {
-			// ตรวจสอบเฉพาะเมื่อเริ่มเซสชันใหม่
 			if (photos.length === 0) {
 				const ready = await checkIfReadyForNewUser();
 				if (!ready) {
@@ -896,7 +968,7 @@
 			}
 
 			if (photos.length >= currentMaxPhotos) {
-				showMessage('✅ ถ่ายครบจำนวนแล้ว!', 'info', 3000);
+				showMessage('✅ ถ่ายครบ 4 รูปแล้ว!', 'info', 3000);
 				return;
 			}
 
@@ -904,11 +976,9 @@
 			captureBtn.disabled = true;
 			captureBtn.innerHTML = '<div class="spinner"></div><span>กำลังเตรียม...</span>';
 
-			// เริ่ม Countdown
 			await startCountdown(3);
 
 			try {
-				// ถ่ายรูป
 				const canvas = document.createElement('canvas');
 				canvas.width = video.videoWidth;
 				canvas.height = video.videoHeight;
@@ -918,36 +988,30 @@
 				const photoData = canvas.toDataURL('image/jpeg', 0.9);
 				photos.push(photoData);
 				
-				// แสดงภาพตัวอย่าง
 				displayPreview(photoData, photos.length);
-				
-				// อัปเดตตัวนับ
 				photoCounter.textContent = photos.length;
 				
-				// ตรวจสอบถ่ายครบหรือยัง
 				if (photos.length >= currentMaxPhotos) {
 					captureBtn.style.display = 'none';
 					retakeBtn.style.display = 'inline-flex';
+					frameBtn.style.display = 'inline-flex';
 					finishBtn.style.display = 'inline-flex';
 					resetBtn.style.display = 'inline-flex';
 					
 					isProcessing = false;
-					showMessage('🎉 ถ่ายรูปครบแล้ว! กด "พอใจกับรูปนี้" เพื่อบันทึก', 'success', 10000);
+					showMessage('🎉 ถ่ายรูปครบ 4 รูปแล้ว! สามารถเลือกกรอบหรือบันทึกได้', 'success', 10000);
 				} else {
-					// ถ่ายต่อเนื่องอัตโนมัติ
 					isProcessing = false;
 					captureBtn.disabled = false;
 					captureBtn.innerHTML = '<i class="fas fa-camera"></i><span>เริ่มถ่ายรูป</span>';
 					showMessage(`📸 ถ่ายได้อีก ${currentMaxPhotos - photos.length} รูป`, 'info', 2000);
 					
-					// ถ่ายต่ออัตโนมัติหลัง 2 วินาที
 					setTimeout(() => {
 						if (photos.length < currentMaxPhotos && !isProcessing) {
 							capturePhoto();
 						}
 					}, 2000);
 				}
-				
 			} catch (error) {
 				console.error('Capture error:', error);
 				showMessage('❌ เกิดข้อผิดพลาดในการถ่ายรูป', 'error');
@@ -1002,35 +1066,183 @@
 				return;
 			}
 			
-			// ล้างรูปทั้งหมด
 			photos = [];
 			photoCounter.textContent = '0';
 			previewImages.innerHTML = '';
 			
-			// ซ่อนปุ่มต่างๆ
 			retakeBtn.style.display = 'none';
+			frameBtn.style.display = 'none';
 			finishBtn.style.display = 'none';
 			resetBtn.style.display = 'none';
 			
-			// แสดงปุ่มถ่ายรูป
 			captureBtn.style.display = 'inline-flex';
 			captureBtn.disabled = false;
+			captureBtn.innerHTML = '<i class="fas fa-camera"></i><span>เริ่มถ่ายรูป</span>';
 			
 			retakeAvailable = false;
 			
 			showMessage('🔄 เริ่มถ่ายใหม่ทั้งหมด!', 'info', 2000);
 			
-			// เริ่มถ่ายใหม่อัตโนมัติ
 			setTimeout(() => {
 				capturePhoto();
 			}, 2000);
 		}
 
 		// ============================================
-		// Finish Session
+		// Frame Functions
 		// ============================================
-		let processingTimeout = null;
+		function showFrameSelection() {
+			loadFrameTemplates();
+			document.getElementById('frameModal').style.display = 'block';
+		}
 
+		function closeFrameModal() {
+			document.getElementById('frameModal').style.display = 'none';
+		}
+
+		async function loadFrameTemplates() {
+			try {
+				const response = await fetch('/api/frame_templates');
+				const data = await response.json();
+				
+				const container = document.getElementById('frameTemplatesList');
+				container.innerHTML = '';
+				
+				if (data.templates && data.templates.length > 0) {
+					data.templates.forEach(template => {
+						const option = document.createElement('div');
+						option.className = 'frame-option';
+						option.dataset.templateId = template.id;
+						
+						let previewHTML = '';
+						if (template.frame_image_id) {
+							previewHTML = `<img src="/frame/${template.frame_image_id}" alt="${template.name}">`;
+						} else {
+							previewHTML = `<i class="fas fa-border-all" style="font-size: 3rem; color: #666;"></i>`;
+						}
+						
+						option.innerHTML = `
+							<div class="frame-preview">
+								${previewHTML}
+							</div>
+							<h3>${template.name}</h3>
+							<div class="frame-option-info">
+								${template.orientation === 'vertical' ? '📱 แนวตั้ง' : '📺 แนวนอน'}<br>
+								${template.canvas_width} × ${template.canvas_height} px
+							</div>
+							<button class="select-frame-btn" onclick="selectFrame('${template.id}')">เลือก</button>
+						`;
+						
+						container.appendChild(option);
+					});
+				}
+			} catch (error) {
+				console.error('Error loading templates:', error);
+			}
+		}
+
+		function selectFrame(templateId) {
+			selectedTemplateId = templateId;
+			closeFrameModal();
+			
+			if (templateId === 'none') {
+				finishSession();
+			} else {
+				finishSessionWithFrame(templateId);
+			}
+		}
+
+		async function finishSessionWithFrame(templateId) {
+			if (photos.length === 0) {
+				showMessage('⚠️ กรุณาถ่ายรูปก่อน', 'warning', 3000);
+				return;
+			}
+
+			if (isProcessing) {
+				showMessage('⏳ กรุณารอสักครู่...', 'warning', 3000);
+				return;
+			}
+
+			isProcessing = true;
+			frameBtn.disabled = true;
+			frameBtn.innerHTML = '<div class="spinner"></div><span>กำลังสร้างรูป...</span>';
+			
+			processingTimeout = setTimeout(() => {
+				if (isProcessing) {
+					isProcessing = false;
+					frameBtn.disabled = false;
+					frameBtn.innerHTML = '<i class="fas fa-border-all"></i><span>เลือกกรอบและบันทึก</span>';
+					showMessage('❌ ระบบล่าช้า กรุณาลองใหม่', 'error', 3000);
+				}
+			}, 10000);
+			
+			try {
+				const response = await fetch('/api/upload', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ 
+						photos: photos,
+						template_id: templateId
+					})
+				});
+				
+				const data = await response.json();
+				clearTimeout(processingTimeout);
+				
+				if (data.success) {
+					currentPickupCode = data.pickup_code;
+					
+					let message = '';
+					if (data.is_composite) {
+						message = `
+							<div class="qr-display">
+								<h2>🎉 สร้างรูปกรอบสำเร็จ!</h2>
+								<p>👉 กรุณาเดินไปสแกน QR Code<br>ที่จอด้านหน้าเพื่อรับรูปได้ทันที</p>
+							</div>
+						`;
+					} else {
+						message = `
+							<div class="qr-display">
+								<h2>🎉 ถ่ายรูปเสร็จแล้ว!</h2>
+								<p>👉 กรุณาเดินไปสแกน QR Code<br>ที่จอด้านหน้าเพื่อรับรูปได้ทันที</p>
+							</div>
+						`;
+					}
+					
+					showMessage(message, 'success', 30000);
+			
+					captureBtn.style.display = 'none';
+					retakeBtn.style.display = 'none';
+					frameBtn.style.display = 'none';
+					finishBtn.style.display = 'none';
+					resetBtn.style.display = 'none';
+					
+					photos = [];
+					retakeAvailable = true;
+					
+					console.log('✅ บันทึกสำเร็จ รหัส:', currentPickupCode);
+				} else {
+					isProcessing = false;
+					showMessage(`❌ เกิดข้อผิดพลาด: ${data.error}`, 'error', 5000);
+					frameBtn.disabled = false;
+					frameBtn.innerHTML = '<i class="fas fa-border-all"></i><span>เลือกกรอบและบันทึก</span>';
+				}
+			} catch (error) {
+				console.error('Finish session error:', error);
+				
+				clearTimeout(processingTimeout);
+				isProcessing = false;
+				showMessage('❌ การเชื่อมต่อล้มเหลว', 'error', 5000);
+				frameBtn.disabled = false;
+				frameBtn.innerHTML = '<i class="fas fa-border-all"></i><span>เลือกกรอบและบันทึก</span>';
+			}
+		}
+
+		// ============================================
+		// Finish Session (No Frame)
+		// ============================================
 		async function finishSession() {
 			if (photos.length === 0) {
 				showMessage('⚠️ กรุณาถ่ายรูปก่อน', 'warning', 3000);
@@ -1038,7 +1250,7 @@
 			}
 
 			if (isProcessing) {
-				showMessage('⏳ กรุณารอให้ระบบประมวลผลเสร็จก่อน', 'warning', 3000);
+				showMessage('⏳ กรุณารอสักครู่...', 'warning', 3000);
 				return;
 			}
 
@@ -1048,10 +1260,9 @@
 			
 			processingTimeout = setTimeout(() => {
 				if (isProcessing) {
-					console.log('⚠️ Processing timeout! Resetting...');
 					isProcessing = false;
 					finishBtn.disabled = false;
-					finishBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>พอใจกับรูปนี้</span>';
+					finishBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>บันทึก (ไม่ใช้กรอบ)</span>';
 					showMessage('❌ ระบบล่าช้า กรุณาลองใหม่', 'error', 3000);
 				}
 			}, 10000);
@@ -1062,11 +1273,13 @@
 					headers: {
 						'Content-Type': 'application/json',
 					},
-					body: JSON.stringify({ photos: photos })
+					body: JSON.stringify({ 
+						photos: photos,
+						template_id: 'none'
+					})
 				});
 				
 				const data = await response.json();
-				
 				clearTimeout(processingTimeout);
 				
 				if (data.success) {
@@ -1083,6 +1296,7 @@
         
 					captureBtn.style.display = 'none';
 					retakeBtn.style.display = 'none';
+					frameBtn.style.display = 'none';
 					finishBtn.style.display = 'none';
 					resetBtn.style.display = 'none';
 					
@@ -1090,22 +1304,20 @@
 					retakeAvailable = true;
 					
 					console.log('✅ บันทึกสำเร็จ รหัส:', currentPickupCode);
-					
 				} else {
 					isProcessing = false;
 					showMessage(`❌ เกิดข้อผิดพลาด: ${data.error}`, 'error', 5000);
 					finishBtn.disabled = false;
-					finishBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>พอใจกับรูปนี้</span>';
+					finishBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>บันทึก (ไม่ใช้กรอบ)</span>';
 				}
 			} catch (error) {
 				console.error('Finish session error:', error);
 				
 				clearTimeout(processingTimeout);
-				
 				isProcessing = false;
 				showMessage('❌ การเชื่อมต่อล้มเหลว', 'error', 5000);
 				finishBtn.disabled = false;
-				finishBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>พอใจกับรูปนี้</span>';
+				finishBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>บันทึก (ไม่ใช้กรอบ)</span>';
 			}
 		}
 
@@ -1149,28 +1361,12 @@
 		}
 
 		// ============================================
-		// Event Listeners
-		// ============================================
-		photoCountSelect.addEventListener('change', function() {
-			currentMaxPhotos = parseInt(this.value);
-			maxPhotos.textContent = currentMaxPhotos;
-			
-			if (photos.length > 0) {
-				if (confirm('🤔 เปลี่ยนจำนวนรูปจะล้างรูปที่ถ่ายแล้ว\n\nต้องการดำเนินการต่อ?')) {
-					resetSession();
-				} else {
-					this.value = currentMaxPhotos;
-				}
-			}
-		});
-
-		// ============================================
 		// Initialize
 		// ============================================
 		document.addEventListener('DOMContentLoaded', function() {
 			initCamera();
 			
-			currentMaxPhotos = parseInt(photoCountSelect.value);
+			currentMaxPhotos = 4;
 			maxPhotos.textContent = currentMaxPhotos;
 			
 			setInterval(checkAutoReset, 2000);
