@@ -394,7 +394,7 @@ def get_frame_templates():
         else:
             template_copy['frame_image'] = None
         result_templates.append(template_copy)
-    return jsonify(result_templates)
+    return jsonify({'templates': result_templates})
 
 @app.route('/api/frame_templates', methods=['POST'])
 def create_frame_template():
