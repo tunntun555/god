@@ -384,7 +384,17 @@ def download_all(code):
 # ==================== API - FRAME TEMPLATES ====================
 @app.route('/api/frame_templates')
 def get_frame_templates():
-    return jsonify(load_frame_templates())
+    templates = load_frame_templates()
+    # เพิ่ม URL สำหรับรูปกรอบ
+    result_templates = []
+    for template in templates.get('templates', []):
+        template_copy = template.copy()
+        if template.get('frame_image_id'):
+            template_copy['frame_image'] = f"/frame/{template['frame_image_id']}"
+        else:
+            template_copy['frame_image'] = None
+        result_templates.append(template_copy)
+    return jsonify(result_templates)
 
 @app.route('/api/frame_templates', methods=['POST'])
 def create_frame_template():
@@ -432,6 +442,11 @@ def delete_frame_template(template_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/frame_templates/<template_id>/activate', methods=['POST'])
+def activate_frame_template(template_id):
+    """API endpoint สำหรับเปิดใช้งานกรอบ (ยังไม่ได้ implement logic)"""
+    return jsonify({'success': True, 'message': f'Template {template_id} activated'})
+
 @app.route('/frame/<frame_id>')
 def get_frame_image(frame_id):
     if frame_id in FRAME_IMAGES:
@@ -439,6 +454,27 @@ def get_frame_image(frame_id):
     return "Not found", 404
 
 # ==================== API - STATUS & CONTROL ====================
+@app.route('/api/stats')
+def get_stats():
+    """API สำหรับดึงสถิติระบบ"""
+    data = load_data()
+    total_bytes = sum(len(photo_bytes) for photo_bytes in PHOTOS_IN_MEMORY.values())
+    total_mb = total_bytes / (1024 * 1024)
+    
+    return jsonify({
+        'total_sessions': data['stats']['total_sessions'],
+        'total_photos': data['stats']['total_photos'],
+        'total_downloads': data['stats']['total_downloads'],
+        'total_retakes': data['stats']['retake_used'],
+        'memory_mb': round(total_mb, 2)
+    })
+
+@app.route('/api/recent_photos')
+def get_recent_photos():
+    """API สำหรับดึงรูปล่าสุด"""
+    data = load_data()
+    return jsonify(list(reversed(data['photos'])))
+
 @app.route('/api/latest_qr')
 def latest_qr():
     data = load_data()
