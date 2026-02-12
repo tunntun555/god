@@ -695,7 +695,7 @@
 		<!-- Header -->
 		<div class="header">
 			<h1>📸 PHOTO BOOTH</h1>
-			<p>ถ่ายรูปสวยๆ กับกรอบสุดพิเศษ By chongplee audio visual </p>
+			<p>ถ่ายรูปสวยๆ กับกรอบสุดพิเศษ</p>
 		</div>
 
 		<!-- Status Bar -->
@@ -747,15 +747,11 @@
 					</button>
 					<button id="frameBtn" class="btn btn-frame" onclick="showFrameSelection()" style="display: none;">
 						<i class="fas fa-border-all"></i>
-						<span>เลือกกรอบและบันทึก</span>
+						<span>เลือกกรอบและดาวน์โหลด 🎨</span>
 					</button>
 					<button id="finishBtn" class="btn btn-success" onclick="finishSession()" style="display: none;">
 						<i class="fas fa-check-circle"></i>
 						<span>บันทึก (ไม่ใช้กรอบ)</span>
-					</button>
-					<button id="resetBtn" class="btn btn-secondary" onclick="resetSessionWithConfirm()" style="display: none;">
-						<i class="fas fa-times-circle"></i>
-						<span>ยกเลิก</span>
 					</button>
 				</div>
 			</div>
@@ -777,8 +773,7 @@
 	<div id="frameModal" class="frame-modal">
 		<div class="frame-modal-content">
 			<div class="frame-modal-header">
-				<h2>🖼️ เลือกกรอบรูป</h2>
-				<button class="close-modal" onclick="closeFrameModal()">&times;</button>
+				<h2>🖼️ เลือกรูปแบบที่ต้องการดาวน์โหลด</h2>
 			</div>
 			
 			<div class="frame-options">
@@ -786,7 +781,8 @@
 				<div class="frame-option" data-template-id="none">
 					<div class="frame-preview">
 						<i class="fas fa-images" style="font-size: 3rem; color: #666;"></i>
-						<p style="margin-top: 10px;">ไม่ใช้กรอบ (4 รูปแยก)</p>
+						<p style="margin-top: 10px; font-weight: 600;">ไม่ใช้กรอบ</p>
+						<p style="font-size: 0.85rem; opacity: 0.7;">บันทึก 4 รูปแยกกัน</p>
 					</div>
 					<button class="select-frame-btn" onclick="selectFrame('none')">เลือก</button>
 				</div>
@@ -808,7 +804,6 @@
 		let retakeBtn = document.getElementById('retakeBtn');
 		let frameBtn = document.getElementById('frameBtn');
 		let finishBtn = document.getElementById('finishBtn');
-		let resetBtn = document.getElementById('resetBtn');
 		let photoCounter = document.getElementById('photoCounter');
 		let maxPhotos = document.getElementById('maxPhotos');
 		let messageContainer = document.getElementById('messageContainer');
@@ -823,6 +818,7 @@
 		let currentPickupCode = null;
 		let isProcessing = false;
 		let retakeAvailable = true;
+		let retakeUsed = false; // ตัวแปรใหม่: เช็คว่าใช้สิทธิ์ถ่ายใหม่ไปแล้วหรือยัง
 		let selectedTemplateId = null;
 		let processingTimeout = null;
 
@@ -881,10 +877,10 @@
 			retakeBtn.style.display = 'none';
 			frameBtn.style.display = 'none';
 			finishBtn.style.display = 'none';
-			resetBtn.style.display = 'none';
 			
 			currentPickupCode = null;
 			retakeAvailable = true;
+			retakeUsed = false; // รีเซ็ตสิทธิ์ถ่ายใหม่สำหรับผู้ใช้คนใหม่
 			isProcessing = false;
 			selectedTemplateId = null;
 			
@@ -995,11 +991,10 @@
 					captureBtn.style.display = 'none';
 					retakeBtn.style.display = 'inline-flex';
 					frameBtn.style.display = 'inline-flex';
-					finishBtn.style.display = 'inline-flex';
-					resetBtn.style.display = 'inline-flex';
+					finishBtn.style.display = 'none';
 					
 					isProcessing = false;
-					showMessage('🎉 ถ่ายรูปครบ 4 รูปแล้ว! สามารถเลือกกรอบหรือบันทึกได้', 'success', 10000);
+					showMessage('🎉 ถ่ายรูปครบ 4 รูปแล้ว! กรุณาเลือกกรอบ', 'success', 10000);
 				} else {
 					isProcessing = false;
 					captureBtn.disabled = false;
@@ -1059,8 +1054,13 @@
 			previewImages.appendChild(wrapper);
 		}
 
-		// ✅ ถ่ายใหม่ทั้งหมด
+		// ✅ ถ่ายใหม่ทั้งหมด (ได้แค่ 1 ครั้ง)
 		async function retakeAllPhotos() {
+			if (retakeUsed) {
+				showMessage('⚠️ คุณใช้สิทธิ์ถ่ายใหม่ไปแล้ว 1 ครั้ง ไม่สามารถถ่ายใหม่อีกได้', 'warning', 5000);
+				return;
+			}
+			
 			if (!retakeAvailable || isProcessing) {
 				showMessage('⚠️ ไม่สามารถถ่ายใหม่ได้ในขณะนี้', 'warning');
 				return;
@@ -1073,15 +1073,15 @@
 			retakeBtn.style.display = 'none';
 			frameBtn.style.display = 'none';
 			finishBtn.style.display = 'none';
-			resetBtn.style.display = 'none';
 			
 			captureBtn.style.display = 'inline-flex';
 			captureBtn.disabled = false;
 			captureBtn.innerHTML = '<i class="fas fa-camera"></i><span>เริ่มถ่ายรูป</span>';
 			
 			retakeAvailable = false;
+			retakeUsed = true; // บันทึกว่าใช้สิทธิ์ไปแล้ว
 			
-			showMessage('🔄 เริ่มถ่ายใหม่ทั้งหมด!', 'info', 2000);
+			showMessage('🔄 เริ่มถ่ายใหม่ทั้งหมด! (สิทธิ์สุดท้าย)', 'info', 3000);
 			
 			setTimeout(() => {
 				capturePhoto();
@@ -1217,7 +1217,6 @@
 					retakeBtn.style.display = 'none';
 					frameBtn.style.display = 'none';
 					finishBtn.style.display = 'none';
-					resetBtn.style.display = 'none';
 					
 					photos = [];
 					retakeAvailable = true;
@@ -1298,7 +1297,6 @@
 					retakeBtn.style.display = 'none';
 					frameBtn.style.display = 'none';
 					finishBtn.style.display = 'none';
-					resetBtn.style.display = 'none';
 					
 					photos = [];
 					retakeAvailable = true;
