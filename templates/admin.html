@@ -1179,6 +1179,24 @@
                 // Pre-load and cache the image
                 frameImage = new Image();
                 frameImage.onload = function() {
+                    // Auto-detect orientation from uploaded image
+                    const imgWidth = frameImage.naturalWidth;
+                    const imgHeight = frameImage.naturalHeight;
+                    
+                    if (imgWidth > imgHeight) {
+                        // Landscape
+                        document.getElementById('frameOrientation').value = 'landscape';
+                        document.getElementById('canvasWidth').value = '1600';
+                        document.getElementById('canvasHeight').value = '1200';
+                    } else {
+                        // Portrait
+                        document.getElementById('frameOrientation').value = 'portrait';
+                        document.getElementById('canvasWidth').value = '1200';
+                        document.getElementById('canvasHeight').value = '1600';
+                    }
+                    
+                    updateCanvasPreview();
+                    resetPositions();
                     needsRedraw = true;
                 };
                 frameImage.src = frameImageData;
@@ -1192,12 +1210,31 @@
             const width = parseInt(document.getElementById('canvasWidth').value) || 1200;
             const height = parseInt(document.getElementById('canvasHeight').value) || 1600;
             
+            // Calculate canvas display size while maintaining aspect ratio
+            const aspectRatio = width / height;
+            const maxDisplayHeight = 600; // Maximum height for display
+            const maxDisplayWidth = 800; // Maximum width for display
+            
             if (orientation === 'portrait') {
-                canvas.width = 600;
-                canvas.height = 800;
+                // Portrait: prioritize height
+                canvas.height = maxDisplayHeight;
+                canvas.width = Math.round(maxDisplayHeight * aspectRatio);
+                
+                // If width exceeds max, scale down
+                if (canvas.width > maxDisplayWidth) {
+                    canvas.width = maxDisplayWidth;
+                    canvas.height = Math.round(maxDisplayWidth / aspectRatio);
+                }
             } else {
-                canvas.width = 800;
-                canvas.height = 600;
+                // Landscape: prioritize width
+                canvas.width = maxDisplayWidth;
+                canvas.height = Math.round(maxDisplayWidth / aspectRatio);
+                
+                // If height exceeds max, scale down
+                if (canvas.height > maxDisplayHeight) {
+                    canvas.height = maxDisplayHeight;
+                    canvas.width = Math.round(maxDisplayHeight * aspectRatio);
+                }
             }
             
             // Reload image if data changed
