@@ -451,6 +451,8 @@
             flex-direction: column;
             align-items: center;
             gap: 1rem;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
         #frameCanvas {
@@ -1212,29 +1214,16 @@
             
             // Calculate canvas display size while maintaining aspect ratio
             const aspectRatio = width / height;
-            const maxDisplayHeight = 600; // Maximum height for display
-            const maxDisplayWidth = 800; // Maximum width for display
+            const maxDisplayWidth = 600; // Maximum width for display
             
             if (orientation === 'portrait') {
-                // Portrait: prioritize height
-                canvas.height = maxDisplayHeight;
-                canvas.width = Math.round(maxDisplayHeight * aspectRatio);
-                
-                // If width exceeds max, scale down
-                if (canvas.width > maxDisplayWidth) {
-                    canvas.width = maxDisplayWidth;
-                    canvas.height = Math.round(maxDisplayWidth / aspectRatio);
-                }
-            } else {
-                // Landscape: prioritize width
+                // Portrait: ใช้ความกว้างคงที่ ให้ยาวตามอัตราส่วน (ไม่จำกัดความสูง)
                 canvas.width = maxDisplayWidth;
                 canvas.height = Math.round(maxDisplayWidth / aspectRatio);
-                
-                // If height exceeds max, scale down
-                if (canvas.height > maxDisplayHeight) {
-                    canvas.height = maxDisplayHeight;
-                    canvas.width = Math.round(maxDisplayHeight * aspectRatio);
-                }
+            } else {
+                // Landscape: ใช้ความกว้างสูงสุด
+                canvas.width = maxDisplayWidth;
+                canvas.height = Math.round(maxDisplayWidth / aspectRatio);
             }
             
             // Reload image if data changed
@@ -1266,7 +1255,26 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             if (frameImage && frameImage.complete) {
-                ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
+                // Draw frame image to fill entire canvas, maintaining aspect ratio
+                const imgAspect = frameImage.naturalWidth / frameImage.naturalHeight;
+                const canvasAspect = canvas.width / canvas.height;
+                
+                let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
+                
+                if (imgAspect > canvasAspect) {
+                    // Image is wider - fit to height
+                    drawHeight = canvas.height;
+                    drawWidth = drawHeight * imgAspect;
+                    offsetX = (canvas.width - drawWidth) / 2;
+                } else {
+                    // Image is taller - fit to width
+                    drawWidth = canvas.width;
+                    drawHeight = drawWidth / imgAspect;
+                    offsetY = (canvas.height - drawHeight) / 2;
+                }
+                
+                // Draw image covering entire canvas
+                ctx.drawImage(frameImage, offsetX, offsetY, drawWidth, drawHeight);
             } else {
                 ctx.fillStyle = '#3a3a3a';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
