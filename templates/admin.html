@@ -1318,15 +1318,51 @@
                 ctx.shadowOffsetX = 0;
                 ctx.shadowOffsetY = 0;
                 
-                // Draw resize handle if selected
+                // Draw resize handle if selected (ใหญ่ขึ้นและชัดเจนขึ้น)
                 if (selectedPosition === i) {
+                    // Draw resize handle circle
                     ctx.fillStyle = colors[i];
                     ctx.beginPath();
-                    ctx.arc(x + w, y + h, 8, 0, Math.PI * 2);
+                    ctx.arc(x + w, y + h, 12, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = 3;
+                    ctx.lineWidth = 4;
                     ctx.stroke();
+                    
+                    // Draw corner markers for better visibility
+                    ctx.strokeStyle = colors[i];
+                    ctx.lineWidth = 4;
+                    ctx.lineCap = 'round';
+                    
+                    // Top-left
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + 20);
+                    ctx.lineTo(x, y);
+                    ctx.lineTo(x + 20, y);
+                    ctx.stroke();
+                    
+                    // Top-right
+                    ctx.beginPath();
+                    ctx.moveTo(x + w - 20, y);
+                    ctx.lineTo(x + w, y);
+                    ctx.lineTo(x + w, y + 20);
+                    ctx.stroke();
+                    
+                    // Bottom-left
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + h - 20);
+                    ctx.lineTo(x, y + h);
+                    ctx.lineTo(x + 20, y + h);
+                    ctx.stroke();
+                    
+                    // Bottom-right (with resize handle)
+                    ctx.beginPath();
+                    ctx.moveTo(x + w - 20, y + h);
+                    ctx.lineTo(x + w, y + h);
+                    ctx.lineTo(x + w, y + h - 20);
+                    ctx.stroke();
+                    
+                    ctx.lineCap = 'butt';
                 }
             });
         }
@@ -1388,9 +1424,46 @@
         }
 
         function handleMouseMove(e) {
-            if (!isDragging && !isResizing) return;
+            if (!isDragging && !isResizing) {
+                // Update cursor based on hover position
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const scaleX = canvas.width / parseInt(document.getElementById('canvasWidth').value);
+                const scaleY = canvas.height / parseInt(document.getElementById('canvasHeight').value);
+                
+                let cursorSet = false;
+                for (let i = 0; i < photoPositions.length; i++) {
+                    const pos = photoPositions[i];
+                    const x = pos.x * scaleX;
+                    const y = pos.y * scaleY;
+                    const w = pos.width * scaleX;
+                    const h = pos.height * scaleY;
+                    
+                    // Check resize handle
+                    const handleX = x + w;
+                    const handleY = y + h;
+                    const distance = Math.sqrt(Math.pow(mouseX - handleX, 2) + Math.pow(mouseY - handleY, 2));
+                    
+                    if (distance < 15) {
+                        canvas.style.cursor = 'nwse-resize';
+                        cursorSet = true;
+                        break;
+                    } else if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
+                        canvas.style.cursor = 'move';
+                        cursorSet = true;
+                        break;
+                    }
+                }
+                
+                if (!cursorSet) {
+                    canvas.style.cursor = 'default';
+                }
+                return;
+            }
             
-            e.preventDefault(); // ป้องกันการ select ข้อความ
+            e.preventDefault();
             
             const rect = canvas.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
@@ -1398,35 +1471,56 @@
             
             const scaleX = canvas.width / parseInt(document.getElementById('canvasWidth').value);
             const scaleY = canvas.height / parseInt(document.getElementById('canvasHeight').value);
+            const canvasWidth = parseInt(document.getElementById('canvasWidth').value);
+            const canvasHeight = parseInt(document.getElementById('canvasHeight').value);
             
             if (isDragging && selectedPosition !== null) {
-                // Update position - แก้การคำนวณให้ถูกต้อง
-                const newX = Math.round((mouseX - dragStartX) / scaleX);
-                const newY = Math.round((mouseY - dragStartY) / scaleY);
+                // Calculate new position based on mouse delta
+                const deltaX = (mouseX - dragStartX) / scaleX;
+                const deltaY = (mouseY - dragStartY) / scaleY;
                 
-                const maxX = parseInt(document.getElementById('canvasWidth').value) - photoPositions[selectedPosition].width;
-                const maxY = parseInt(document.getElementById('canvasHeight').value) - photoPositions[selectedPosition].height;
+                const initialX = parseFloat(canvas.dataset.initialX);
+                const initialY = parseFloat(canvas.dataset.initialY);
                 
-                photoPositions[selectedPosition].x = Math.max(0, Math.min(newX, maxX));
-                photoPositions[selectedPosition].y = Math.max(0, Math.min(newY, maxY));
+                let newX = initialX + deltaX;
+                let newY = initialY + deltaY;
+                
+                // Constrain within canvas
+                newX = Math.max(0, Math.min(newX, canvasWidth - photoPositions[selectedPosition].width));
+                newY = Math.max(0, Math.min(newY, canvasHeight - photoPositions[selectedPosition].height));
+                
+                photoPositions[selectedPosition].x = newX;
+                photoPositions[selectedPosition].y = newY;
                 
             } else if (isResizing && selectedPosition !== null) {
-                // Update size - แก้การคำนวณให้ถูกต้อง
                 const pos = photoPositions[selectedPosition];
-                const x = pos.x * scaleX;
-                const y = pos.y * scaleY;
+                const startX = pos.x * scaleX;
+                const startY = pos.y * scaleY;
                 
-                const newWidth = Math.round((mouseX - x) / scaleX);
-                const newHeight = Math.round((mouseY - y) / scaleY);
+                // Calculate size change from handle movement
+                const deltaX = mouseX - dragStartX;
+                const deltaY = mouseY - dragStartY;
                 
-                const maxWidth = parseInt(document.getElementById('canvasWidth').value) - pos.x;
-                const maxHeight = parseInt(document.getElementById('canvasHeight').value) - pos.y;
+                // Store initial size on first resize
+                if (!canvas.dataset.initialWidth) {
+                    canvas.dataset.initialWidth = pos.width;
+                    canvas.dataset.initialHeight = pos.height;
+                }
                 
-                photoPositions[selectedPosition].width = Math.max(50, Math.min(newWidth, maxWidth));
-                photoPositions[selectedPosition].height = Math.max(50, Math.min(newHeight, maxHeight));
+                const initialWidth = parseFloat(canvas.dataset.initialWidth);
+                const initialHeight = parseFloat(canvas.dataset.initialHeight);
+                
+                let newWidth = initialWidth + (deltaX / scaleX);
+                let newHeight = initialHeight + (deltaY / scaleY);
+                
+                // Constrain size
+                newWidth = Math.max(50, Math.min(newWidth, canvasWidth - pos.x));
+                newHeight = Math.max(50, Math.min(newHeight, canvasHeight - pos.y));
+                
+                photoPositions[selectedPosition].width = newWidth;
+                photoPositions[selectedPosition].height = newHeight;
             }
             
-            // Mark for redraw instead of immediate redraw
             needsRedraw = true;
             updatePositionDisplay();
             updateInputFields();
@@ -1435,7 +1529,14 @@
         function handleMouseUp() {
             isDragging = false;
             isResizing = false;
-            canvas.style.cursor = 'crosshair';
+            canvas.style.cursor = 'default';
+            
+            // Clear stored values
+            delete canvas.dataset.initialX;
+            delete canvas.dataset.initialY;
+            delete canvas.dataset.initialWidth;
+            delete canvas.dataset.initialHeight;
+            delete canvas.dataset.resizeCorner;
         }
 
         // Position Selection
