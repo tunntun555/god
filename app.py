@@ -444,7 +444,9 @@ def delete_frame_template(template_id):
 
 @app.route('/api/frame_templates/<template_id>/activate', methods=['POST'])
 def activate_frame_template(template_id):
-    """API endpoint สำหรับเปิดใช้งานกรอบ (ยังไม่ได้ implement logic)"""
+    """API endpoint สำหรับเปิดใช้งานกรอบ"""
+    # ปัจจุบันยังไม่มีการเก็บสถานะ active แยกต่างหาก
+    # สามารถเพิ่ม logic การเก็บสถานะได้ในอนาคต
     return jsonify({'success': True, 'message': f'Template {template_id} activated'})
 
 @app.route('/frame/<frame_id>')
@@ -719,12 +721,15 @@ if __name__ == '__main__':
     # โหลด frame templates
     load_frame_templates()
     
-    print(f"🚀 Starting Photo Booth Server on port {port}")
+    print("🚀 Starting Photo Booth Server")
+    print("=" * 50)
+    print(f"📌 Server URL: http://localhost:{port}")
     print(f"💾 Storage Mode: RAM (In-Memory)")
     print(f"🖼️ Frame System: Enabled")
     print(f"📸 Camera Page: http://localhost:{port}/capture")
     print(f"📱 QR Display: http://localhost:{port}/qr")
     print(f"⚙️ Admin Panel: http://localhost:{port}/admin")
     print(f"🔧 Debug Mode: {debug_mode}")
+    print("=" * 50)
     
     app.run(host='0.0.0.0', port=port, debug=debug_mode)
